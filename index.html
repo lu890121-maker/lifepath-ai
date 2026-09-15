@@ -41,6 +41,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hira
 .action-item{display:flex;align-items:flex-start;padding:12px;background:var(--bg);border-radius:8px;margin-bottom:8px}
 .action-number{width:24px;height:24px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;margin-right:12px;flex-shrink:0}
 .action-text{flex:1;font-size:14px}
+.action-priority{font-size:11px;padding:2px 8px;border-radius:4px;margin-left:8px;background:var(--primary);color:#fff}
+.action-due{font-size:11px;color:var(--text-light);margin-top:4px}
 .action-status{font-size:12px;padding:2px 8px;border-radius:4px;margin-left:8px;cursor:pointer}
 .status-done{background:#d1fae5;color:#065f46}
 .status-later{background:#fef3c7;color:#92400e}
@@ -110,6 +112,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hira
 .ab-card-value{font-size:20px;font-weight:700;text-align:center;margin-bottom:4px}
 .ab-card-desc{font-size:12px;color:var(--text-light);text-align:center}
 .sim-disclaimer{font-size:12px;color:var(--warning);background:#fffbeb;padding:12px;border-radius:8px;margin-top:16px;border:1px solid #fde68a;text-align:center}
+.review-btn{padding:6px 12px;border-radius:4px;font-size:12px;cursor:pointer;border:1px solid var(--border);background:var(--card);margin-top:8px}
+.review-btn:hover{background:var(--bg)}
 @media(max-width:640px){.dimension-scores,.simulation-result,.ab-compare{grid-template-columns:1fr}}
 </style>
 </head>
@@ -121,17 +125,36 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hira
 
 <!-- 首次填写 -->
 <div id="onboarding" class="page active">
+  <!-- 主入口：问题输入 -->
+  <div class="hero-input" style="margin-bottom:24px">
+    <div class="hero-input-title">🔥 我现在遇到一个问题</div>
+    <div class="input-area">
+      <textarea id="onboardingQuestion" placeholder="例如：我 32 岁，月薪 1.5 万，存款 20 万，房贷 80 万，不知道该继续工作还是创业。" style="min-height:100px"></textarea>
+      <button onclick="submitOnboardingQuestion()">→</button>
+    </div>
+    <div class="quick-questions" style="margin-top:12px">
+      <div class="quick-question" onclick="fillOnboardingQuestion('我要不要换工作？')">换工作</div>
+      <div class="quick-question" onclick="fillOnboardingQuestion('我要不要买房？')">买房</div>
+      <div class="quick-question" onclick="fillOnboardingQuestion('我要不要创业？')">创业</div>
+      <div class="quick-question" onclick="fillOnboardingQuestion('我要不要辞职？')">辞职</div>
+      <div class="quick-question" onclick="fillOnboardingQuestion('我要不要提前还贷？')">提前还贷</div>
+      <div class="quick-question" onclick="fillOnboardingQuestion('我要不要投资？')">投资</div>
+      <div class="quick-question" onclick="fillOnboardingQuestion('我要不要去另一个城市？')">去其他城市</div>
+    </div>
+  </div>
+  
+  <!-- 5 项基础信息（可选） -->
   <div class="card">
-    <h2 style="font-size:20px;margin-bottom:8px">开始使用</h2>
-    <p style="color:var(--text-light);margin-bottom:24px">只需5项信息，30秒获得第一次分析</p>
+    <h3 style="font-size:16px;margin-bottom:12px">第一次使用？补充 5 项基础信息</h3>
+    <p style="color:var(--text-light);font-size:13px;margin-bottom:16px">也可以直接在上面输入问题，AI 会自动提取信息</p>
     <form id="onboardingForm">
-      <div class="form-group"><label class="form-label">年龄</label><input type="number" class="form-input" id="ob_age" placeholder="例如：30" required min="18" max="80"></div>
-      <div class="form-group"><label class="form-label">月收入（税后）</label><input type="number" class="form-input" id="ob_income" placeholder="例如：15000" required min="0"></div>
-      <div class="form-group"><label class="form-label">可用资产</label><input type="number" class="form-input" id="ob_savings" placeholder="例如：200000" required min="0"></div>
-      <div class="form-group"><label class="form-label">当前负债</label><input type="number" class="form-input" id="ob_debt" placeholder="例如：100000" required min="0"></div>
+      <div class="form-group"><label class="form-label">年龄</label><input type="number" class="form-input" id="ob_age" placeholder="例如：30" min="18" max="80"></div>
+      <div class="form-group"><label class="form-label">月收入（税后）</label><input type="number" class="form-input" id="ob_income" placeholder="例如：15000" min="0"></div>
+      <div class="form-group"><label class="form-label">可用资产</label><input type="number" class="form-input" id="ob_savings" placeholder="例如：200000" min="0"></div>
+      <div class="form-group"><label class="form-label">当前负债</label><input type="number" class="form-input" id="ob_debt" placeholder="例如：100000" min="0"></div>
       <div class="form-group">
         <label class="form-label">当前最想解决的问题</label>
-        <select class="form-input" id="ob_problem" required>
+        <select class="form-input" id="ob_problem">
           <option value="">请选择</option>
           <option value="career">工作/收入</option>
           <option value="finance">财务/理财</option>
@@ -142,7 +165,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hira
           <option value="lost">不知道下一步怎么办</option>
         </select>
       </div>
-      <button type="submit" class="btn btn-primary btn-block">开始分析</button>
+      <button type="submit" class="btn btn-primary btn-block">保存并开始分析</button>
     </form>
   </div>
 </div>
@@ -161,16 +184,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hira
   </div>
   <div class="problem-card">
     <div class="problem-title">你现在最大的问题</div>
-    <div class="problem-text" id="mainProblem">加载中...</div>
+    <div class="problem-text" id="mainProblem">完成第一次分析后，这里会显示你的当前核心问题</div>
   </div>
   <div class="card">
     <div class="card-title">你现在最应该做</div>
-    <ul class="action-list" id="topActions"></ul>
+    <ul class="action-list" id="topActions">
+      <li class="action-item"><div class="action-number">1</div><div class="action-text">完成第一次分析后，这里会显示建议行动</div></li>
+    </ul>
   </div>
   <div class="hero-input">
     <div class="hero-input-title">🔥 我现在遇到一个问题</div>
     <div class="input-area">
-      <textarea id="questionInput" placeholder="直接说出你的问题，例如：&#10;我32岁，月薪1.5万，存款20万，房贷80万，不知道该继续工作还是创业。"></textarea>
+      <textarea id="questionInput" placeholder="直接说出你的问题，例如：&#10;我 32 岁，月薪 1.5 万，存款 20 万，房贷 80 万，不知道该继续工作还是创业。"></textarea>
       <button onclick="submitQuestion()">→</button>
     </div>
     <div class="quick-questions" style="margin-top:12px">
@@ -181,7 +206,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hira
       <div class="quick-question" onclick="askQuick('我要不要提前还贷？')">提前还贷</div>
       <div class="quick-question" onclick="askQuick('我要不要投资？')">投资</div>
       <div class="quick-question" onclick="askQuick('我要不要去另一个城市？')">去其他城市</div>
-      <div class="quick-question" onclick="askQuick('如果什么都不改变，5年后会怎样？')">5年后会怎样</div>
+      <div class="quick-question" onclick="askQuick('如果什么都不改变，5 年后会怎样？')">5 年后会怎样</div>
     </div>
   </div>
 </div>
@@ -219,9 +244,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hira
       <div class="simulation-slider"><label><span>房贷月供变化</span><span id="mortgageChangeValue">0%</span></label><input type="range" id="mortgageChange" min="-50" max="100" value="0" oninput="updateSimulation()"></div>
     </div>
     <div class="simulation-result">
-      <div class="simulation-item"><div class="simulation-label">1年后资产</div><div class="simulation-value" id="asset1Year">--</div><div class="simulation-change" id="asset1YearChange">--</div></div>
-      <div class="simulation-item"><div class="simulation-label">3年后资产</div><div class="simulation-value" id="asset3Year">--</div><div class="simulation-change" id="asset3YearChange">--</div></div>
-      <div class="simulation-item"><div class="simulation-label">5年后资产</div><div class="simulation-value" id="asset5Year">--</div><div class="simulation-change" id="asset5YearChange">--</div></div>
+      <div class="simulation-item"><div class="simulation-label">1 年后资产</div><div class="simulation-value" id="asset1Year">--</div><div class="simulation-change" id="asset1YearChange">--</div></div>
+      <div class="simulation-item"><div class="simulation-label">3 年后资产</div><div class="simulation-value" id="asset3Year">--</div><div class="simulation-change" id="asset3YearChange">--</div></div>
+      <div class="simulation-item"><div class="simulation-label">5 年后资产</div><div class="simulation-value" id="asset5Year">--</div><div class="simulation-change" id="asset5YearChange">--</div></div>
       <div class="simulation-item"><div class="simulation-label">影响最大的变量</div><div class="simulation-value" id="keyVariable" style="font-size:14px">--</div></div>
     </div>
     <div class="sim-disclaimer">⚠️ 以上所有结果均为假设估算和情景模拟，不构成确定性预测。实际情况受多种因素影响。</div>
@@ -231,7 +256,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hira
     <p style="color:var(--text-light);font-size:14px;margin-bottom:12px">看看哪个变量对你的未来影响最大</p>
     <div id="abCompare">
       <div class="ab-compare">
-        <div class="ab-card"><div class="ab-card-title">什么都不改变</div><div class="ab-card-value" id="abBase">--</div><div class="ab-card-desc">5年后资产（基准）</div></div>
+        <div class="ab-card"><div class="ab-card-title">什么都不改变</div><div class="ab-card-value" id="abBase">--</div><div class="ab-card-desc">5 年后资产（基准）</div></div>
         <div class="ab-card better"><div class="ab-card-title" id="abBestTitle">--</div><div class="ab-card-value" id="abBest">--</div><div class="ab-card-desc" id="abBestDesc">--</div></div>
       </div>
     </div>
@@ -242,19 +267,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hira
 <!-- 行动 -->
 <div id="action" class="page">
   <div class="card">
-    <div class="card-title">未来90天行动计划</div>
-    <p style="color:var(--text-light);font-size:14px;margin-bottom:16px">最多5件事情。可以标记完成、延后或放弃。</p>
+    <div class="card-title">未来 90 天行动计划</div>
+    <p style="color:var(--text-light);font-size:14px;margin-bottom:16px">最多 5 件事情。可以标记完成、延后或放弃。</p>
     <ul class="task-list" id="taskList">
-      <li class="empty-state"><div class="empty-state-icon">📋</div><div class="empty-state-title">还没有行动计划</div><div class="empty-state-text">完成第一次分析后，会为你生成90天行动计划</div></li>
+      <li class="empty-state"><div class="empty-state-icon">📋</div><div class="empty-state-title">还没有行动计划</div><div class="empty-state-text">完成第一次分析后，会为你生成 90 天行动计划</div></li>
     </ul>
   </div>
 </div>
 
 <!-- 我的 -->
 <div id="profile" class="page">
-  <div class="card"><div class="card-title">基础信息</div><div id="profileBasic"><div style="color:var(--text-light);font-size:14px">加载中...</div></div></div>
+  <div class="card"><div class="card-title">基础信息</div><div id="profileBasic"><div style="color:var(--text-light);font-size:14px">完成第一次分析后，这里会显示你的基础信息</div></div></div>
   <div class="card"><div class="card-title">详细资料</div><div id="profileDetail"><div style="color:var(--text-light);font-size:14px">可在后续使用中逐步补充</div></div></div>
-  <div class="card"><div class="card-title">历史决策</div><div id="profileDecisions"><div style="color:var(--text-light);font-size:14px">加载中...</div></div></div>
+  <div class="card"><div class="card-title">历史决策</div><div id="profileDecisions"><div style="color:var(--text-light);font-size:14px">完成第一次分析后，这里会显示历史决策</div></div></div>
   <button class="btn btn-secondary btn-block" onclick="exportData()">导出数据</button>
   <button class="btn btn-secondary btn-block" style="margin-top:8px" onclick="resetData()">重置所有数据</button>
 </div>
@@ -263,7 +288,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hira
 <div class="bottom-nav">
   <button class="nav-item active" onclick="switchPage('home',this)"><div class="nav-icon">🏠</div><div>首页</div></button>
   <button class="nav-item" onclick="switchPage('decide',this)"><div class="nav-icon">💭</div><div>做决定</div></button>
-  <button class="nav-item" onclick="switchPage('simulate',this)"><div class="nav-icon">📊</div><div>模拟未来</div></button>
+  <button class="nav-item" onclick="switchPage('simulate',this)"><div class="nav-icon"></div><div>模拟未来</div></button>
   <button class="nav-item" onclick="switchPage('action',this)"><div class="nav-icon">✅</div><div>行动</div></button>
   <button class="nav-item" onclick="switchPage('profile',this)"><div class="nav-icon">👤</div><div>我的</div></button>
 </div>
@@ -273,7 +298,44 @@ let userData=null;
 function init(){const s=localStorage.getItem('lifepath_user');if(s){userData=JSON.parse(s);showMainApp()}else{showOnboarding()}}
 function showOnboarding(){document.getElementById('onboarding').classList.add('active');document.getElementById('home').classList.remove('active');document.querySelector('.bottom-nav').style.display='none'}
 function showMainApp(){document.getElementById('onboarding').classList.remove('active');document.getElementById('home').classList.add('active');document.querySelector('.bottom-nav').style.display='flex';updateHomePage();updateSimulation();updateProfile();updateActionPage()}
-document.getElementById('onboardingForm').addEventListener('submit',function(e){e.preventDefault();userData={age:parseInt(document.getElementById('ob_age').value),income:parseInt(document.getElementById('ob_income').value),savings:parseInt(document.getElementById('ob_savings').value),debt:parseInt(document.getElementById('ob_debt').value),currentProblem:document.getElementById('ob_problem').value,decisions:[],actions:[],createdAt:Date.now()};saveUserData();showMainApp()});
+
+// 首次提交问题
+function submitOnboardingQuestion(){
+  const text=document.getElementById('onboardingQuestion').value.trim();
+  if(!text){alert('请输入你的问题');return}
+  const parsed=parseNaturalLanguage(text);
+  userData={
+    age:parsed.age||30,
+    income:parsed.income||15000,
+    savings:parsed.savings||200000,
+    debt:parsed.debt||0,
+    currentProblem:parsed.problemType||'lost',
+    decisions:[],
+    actions:[],
+    createdAt:Date.now()
+  };
+  saveUserData();
+  showMainApp();
+  setTimeout(()=>{
+    switchPage('decide',document.querySelectorAll('.nav-item')[1]);
+    document.getElementById('decideInput').value=text;
+    submitDecision();
+  },500);
+}
+function fillOnboardingQuestion(q){document.getElementById('onboardingQuestion').value=q}
+
+document.getElementById('onboardingForm').addEventListener('submit',function(e){
+  e.preventDefault();
+  const age=parseInt(document.getElementById('ob_age').value)||30;
+  const income=parseInt(document.getElementById('ob_income').value)||15000;
+  const savings=parseInt(document.getElementById('ob_savings').value)||0;
+  const debt=parseInt(document.getElementById('ob_debt').value)||0;
+  const currentProblem=document.getElementById('ob_problem').value||'lost';
+  userData={age,income,savings,debt,currentProblem,decisions:[],actions:[],createdAt:Date.now()};
+  saveUserData();
+  showMainApp();
+});
+
 function saveUserData(){localStorage.setItem('lifepath_user',JSON.stringify(userData))}
 function switchPage(pageId,el){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));document.getElementById(pageId).classList.add('active');if(el)el.classList.add('active');if(pageId==='home')updateHomePage();if(pageId==='simulate')updateSimulation();if(pageId==='action')updateActionPage();if(pageId==='profile')updateProfile();if(pageId==='decide')updateDecisionList()}
 
@@ -295,7 +357,7 @@ function calc(){
 function identifyMainProblem(){
   const s=calc();
   if(s.finance<50)return'财务状况需要重点关注，建议先建立应急储备';
-  if(s.emergencyMonths<3)return'应急储备不足，建议先存够6个月生活费';
+  if(s.emergencyMonths<3)return'应急储备不足，建议先存够 6 个月生活费';
   const p=userData.currentProblem;
   if(p==='career')return'职业发展遇到瓶颈，需要明确下一步方向';
   if(p==='finance')return'财务规划需要优化，建议制定明确的理财目标';
@@ -306,19 +368,18 @@ function identifyMainProblem(){
   return'当前状况总体稳定，建议持续优化各项指标'
 }
 
-// ===== 生成5项行动 =====
+// ===== 生成 5 项行动 =====
 function generateActions(){
   const s=calc();const a=[];
-  if(s.emergencyMonths<6)a.push('建立6个月生活费的应急储备');
-  if(s.finance<60)a.push('优化支出结构，提高储蓄率到20%以上');
-  if(userData.currentProblem==='career'||userData.currentProblem==='change')a.push('明确职业方向，制定3个月技能提升计划');
-  if(userData.debt>0&&userData.savings>userData.debt*.5)a.push('制定还债计划，优先偿还高利率负债');
-  if(s.monthlySaving<userData.income*.2)a.push('提升收入或降低支出，提高月结余');
-  a.push('设定下一个阶段性目标并拆解为月度任务');
-  a.push('定期复盘和调整计划');
-  // 去重并限制5项
-  const unique=[...new Set(a)];
-  return unique.slice(0,5)
+  if(s.emergencyMonths<6)a.push({title:'建立 6 个月生活费的应急储备',priority:'高',due:'30 天内'});
+  if(s.finance<60)a.push({title:'优化支出结构，提高储蓄率到 20% 以上',priority:'高',due:'30 天内'});
+  if(userData.currentProblem==='career'||userData.currentProblem==='change')a.push({title:'明确职业方向，制定 3 个月技能提升计划',priority:'中',due:'60 天内'});
+  if(userData.debt>0&&userData.savings>userData.debt*.5)a.push({title:'制定还债计划，优先偿还高利率负债',priority:'高',due:'30 天内'});
+  if(s.monthlySaving<userData.income*.2)a.push({title:'提升收入或降低支出，提高月结余',priority:'中',due:'60 天内'});
+  a.push({title:'设定下一个阶段性目标并拆解为月度任务',priority:'低',due:'90 天内'});
+  a.push({title:'定期复盘和调整计划',priority:'低',due:'90 天内'});
+  const unique=[...new Set(a.map(x=>x.title))];
+  return a.filter((v,i)=>a.findIndex(x=>x.title===v.title)===i).slice(0,5)
 }
 
 // ===== 更新首页 =====
@@ -333,21 +394,20 @@ function updateHomePage(){
   document.getElementById('growthScore').textContent=s.growth;
   document.getElementById('mainProblem').textContent=identifyMainProblem();
   const actions=generateActions();
-  document.getElementById('topActions').innerHTML=actions.map((a,i)=>'<li class="action-item"><div class="action-number">'+(i+1)+'</div><div class="action-text">'+a+'</div></li>').join('')
+  document.getElementById('topActions').innerHTML=actions.map((a,i)=>'<li class="action-item"><div class="action-number">'+(i+1)+'</div><div class="action-text">'+a.title+'</div><span class="action-priority">'+a.priority+'</span></li>').join('')
 }
 
 // ===== 自然语言解析 =====
 function parseNaturalLanguage(text){
   const info={};
   const ageM=text.match(/(\d{2})岁/);if(ageM)info.age=parseInt(ageM[1]);
-  const incomeM=text.match(/月薪?([\d.]+)万/);if(incomeM)info.income=Math.round(parseFloat(incomeM[1])*10000);
-  else{const incomeM2=text.match(/月入?([\d.]+)万/);if(incomeM2)info.income=Math.round(parseFloat(incomeM2[1])*10000)}
-  const savingsM=text.match(/存款([\d.]+)万/);if(savingsM)info.savings=Math.round(parseFloat(savingsM[1])*10000);
-  else{const s2=text.match(/积蓄([\d.]+)万/);if(s2)info.savings=Math.round(parseFloat(s2[1])*10000)}
-  const debtM=text.match(/房贷([\d.]+)万/);if(debtM)info.debt=Math.round(parseFloat(debtM[1])*10000);
-  else{const d2=text.match(/负债([\d.]+)万/);if(d2)info.debt=Math.round(parseFloat(d2[1])*10000);
-  else{const d3=text.match(/贷款([\d.]+)万/);if(d3)info.debt=Math.round(parseFloat(d3[1])*10000)}}
-  // 识别问题类型
+  const incomeM=text.match(/月薪？([\d.]+) 万/);if(incomeM)info.income=Math.round(parseFloat(incomeM[1])*10000);
+  else{const incomeM2=text.match(/月入？([\d.]+) 万/);if(incomeM2)info.income=Math.round(parseFloat(incomeM2[1])*10000)}
+  const savingsM=text.match(/存款 ([\d.]+) 万/);if(savingsM)info.savings=Math.round(parseFloat(savingsM[1])*10000);
+  else{const s2=text.match(/积蓄 ([\d.]+) 万/);if(s2)info.savings=Math.round(parseFloat(s2[1])*10000)}
+  const debtM=text.match(/房贷 ([\d.]+) 万/);if(debtM)info.debt=Math.round(parseFloat(debtM[1])*10000);
+  else{const d2=text.match(/负债 ([\d.]+) 万/);if(d2)info.debt=Math.round(parseFloat(d2[1])*10000);
+  else{const d3=text.match(/贷款 ([\d.]+) 万/);if(d3)info.debt=Math.round(parseFloat(d3[1])*10000)}}
   if(text.includes('换工作')||text.includes('跳槽'))info.problemType='career';
   else if(text.includes('买房')||text.includes('购房'))info.problemType='house';
   else if(text.includes('创业'))info.problemType='startup';
@@ -355,7 +415,7 @@ function parseNaturalLanguage(text){
   else if(text.includes('还贷')||text.includes('提前还'))info.problemType='prepay';
   else if(text.includes('投资')||text.includes('理财'))info.problemType='invest';
   else if(text.includes('城市')||text.includes('搬家'))info.problemType='relocate';
-  else if(text.includes('5年')||text.includes('未来'))info.problemType='future';
+  else if(text.includes('5 年')||text.includes('未来'))info.problemType='future';
   return info
 }
 
@@ -363,7 +423,6 @@ function parseNaturalLanguage(text){
 function submitQuestion(){
   const text=document.getElementById('questionInput').value.trim();
   if(!text)return;
-  // 尝试解析自然语言
   const parsed=parseNaturalLanguage(text);
   let updated=false;
   if(parsed.age&&parsed.age!==userData.age){userData.age=parsed.age;updated=true}
@@ -371,7 +430,6 @@ function submitQuestion(){
   if(parsed.savings!==undefined&&parsed.savings!==userData.savings){userData.savings=parsed.savings;updated=true}
   if(parsed.debt!==undefined&&parsed.debt!==userData.debt){userData.debt=parsed.debt;updated=true}
   if(updated)saveUserData();
-  // 跳转到做决定页面
   switchPage('decide',document.querySelectorAll('.nav-item')[1]);
   document.getElementById('decideInput').value=text;
   submitDecision()
@@ -383,7 +441,7 @@ function getRequiredInfo(question){
   const fields=[];
   if(question.includes('换工作')||question.includes('跳槽')){
     if(!userData.industry)fields.push({key:'industry',label:'你所在的行业',type:'select',options:['互联网/科技','金融','教育','医疗','制造业','房地产','消费/零售','能源','传媒','其他']});
-    if(!userData.workYears)fields.push({key:'workYears',label:'工作年限',type:'select',options:['1-3年','3-5年','6-10年','10年以上']});
+    if(!userData.workYears)fields.push({key:'workYears',label:'工作年限',type:'select',options:['1-3 年','3-5 年','6-10 年','10 年以上']});
   }
   if(question.includes('买房')||question.includes('购房')){
     if(!userData.city)fields.push({key:'city',label:'目标城市',type:'select',options:['一线城市','新一线','二线','三线及以下']});
@@ -429,11 +487,10 @@ function submitProgressive(){
   });
   saveUserData();
   area.innerHTML='';
-  // 重新分析
   const q=document.getElementById('decideInput').value.trim();
   if(q){
     const analysis=generateDecisionAnalysis(q);
-    const decision={id:Date.now(),question:q,analysis:analysis,createdAt:Date.now()};
+    const decision={id:Date.now(),question:q,analysis:analysis,createdAt:Date.now(),status:'active'};
     userData.decisions.unshift(decision);
     saveUserData();
     showDecisionDetail(decision)
@@ -444,15 +501,13 @@ function submitProgressive(){
 function submitDecision(){
   const q=document.getElementById('decideInput').value.trim();
   if(!q)return;
-  // 检查是否需要补充信息
   const fields=getRequiredInfo(q);
   const missingFields=fields.filter(f=>!userData[f.key]);
   if(missingFields.length>0){
     showProgressiveForm(q);
-    // 仍然生成初步分析
   }
   const analysis=generateDecisionAnalysis(q);
-  const decision={id:Date.now(),question:q,analysis:analysis,createdAt:Date.now()};
+  const decision={id:Date.now(),question:q,analysis:analysis,createdAt:Date.now(),status:'active'};
   userData.decisions.unshift(decision);
   saveUserData();
   showDecisionDetail(decision);
@@ -462,74 +517,81 @@ function submitDecision(){
 // ===== 决策分析引擎 =====
 function generateDecisionAnalysis(q){
   const s=calc();const nw=s.netWorth;
-  let a={score:50,conclusion:'',reasons:[],support:[],against:[],risks:[],opportunities:[],nextSteps:[],reevaluate:[]};
+  let a={score:50,conclusion:'',mainProblem:'',reasons:[],support:[],against:[],risks:[],opportunities:[],nextSteps:[],reevaluate:[]};
 
   if(q.includes('换工作')||q.includes('跳槽')){
     a.score=s.career>60?40:65;
     a.conclusion=s.career>60?'建议暂缓，当前工作仍有价值':'可以考虑，但需要充分准备';
+    a.mainProblem=s.career>60?'你当前职业基础还不错，跳槽的边际收益有限':'你的职业发展遇到瓶颈，需要找到突破口';
     a.reasons=['当前职业评分'+s.career+'分，'+(s.career>60?'基础还不错':'有提升空间'),'年龄'+userData.age+'岁，'+(userData.age<35?'还有试错时间':'需要更谨慎'),'净资产'+fmt(nw)+'元，'+(nw>100000?'有一定安全垫':'需要确保财务安全')];
     a.support=['可能获得更高收入','更好的发展平台','跳出舒适区有助于成长'];
     a.against=['失去现有积累和人脉','适应期收入可能下降','新环境不确定性大'];
     a.risks=['新工作可能不如预期','适应期影响收入稳定性'];
-    a.opportunities=['薪资可能提升20-50%','接触新行业和技术'];
-    a.nextSteps=['更新简历，梳理可量化成果','建立应急储备（至少6个月生活费）','开始接触机会，不要急于决定'];
-    a.reevaluate=['如果出现薪资涨幅>30%的机会','如果当前工作环境明显恶化','如果财务状况进一步改善']
+    a.opportunities=['薪资可能提升 20-50%','接触新行业和技术'];
+    a.nextSteps=['更新简历，梳理可量化成果','建立应急储备（至少 6 个月生活费）','开始接触机会，不要急于决定'];
+    a.reevaluate=['如果出现薪资涨幅>30% 的机会','如果当前工作环境明显恶化','如果财务状况进一步改善']
   }else if(q.includes('买房')||q.includes('购房')){
     const em=s.emergencyMonths;
     a.score=em>=6&&nw>200000?55:35;
     a.conclusion=em>=6&&nw>200000?'可以考虑，但需要谨慎评估':'建议暂缓，先夯实财务基础';
-    a.reasons=['应急储备'+em.toFixed(1)+'个月，'+(em>=6?'相对充足':'不够充足'),'净资产'+fmt(nw)+'元，'+(nw>200000?'有一定基础':'还需积累'),'月供不应超过收入40%'];
+    a.mainProblem=em<6?'应急储备不足，买房会进一步降低财务安全性':'需要评估长期还款能力和职业稳定性';
+    a.reasons=['应急储备'+em.toFixed(1)+'个月，'+(em>=6?'相对充足':'不够充足'),'净资产'+fmt(nw)+'元，'+(nw>200000?'有一定基础':'还需积累'),'月供不应超过收入 40%'];
     a.support=['长期资产增值可能','稳定居住环境','可能的政策优惠'];
-    a.against=['流动性大幅降低','月供压力持续20-30年','机会成本（资金被锁定）'];
+    a.against=['流动性大幅降低','月供压力持续 20-30 年','机会成本（资金被锁定）'];
     a.risks=['房价波动风险','月供压力影响生活质量','流动性降低，应急能力下降'];
     a.opportunities=['长期可能资产增值','提供稳定的居住和生活基础'];
-    a.nextSteps=['确保应急储备至少6个月','计算可承受的房价和月供','了解当地购房政策和贷款条件'];
+    a.nextSteps=['确保应急储备至少 6 个月','计算可承受的房价和月供','了解当地购房政策和贷款条件'];
     a.reevaluate=['如果收入稳定增长','如果房价出现明显调整','如果有购房优惠政策']
   }else if(q.includes('创业')){
     a.score=nw>300000?50:30;
     a.conclusion=nw>300000?'可以尝试，但需要充分准备':'建议暂缓，先积累更多资源和经验';
+    a.mainProblem=nw<300000?'资金储备不足，创业风险过高':'需要验证商业模式和市场需求';
     a.reasons=['创业需要充足资金储备','当前净资产'+fmt(nw)+'元，'+(nw>300000?'有一定基础':'还需积累'),'创业风险高'];
     a.support=['可能获得更高收入','实现个人价值','积累宝贵经验'];
     a.against=['失败率高（>80%）','收入不稳定','需要大量时间精力'];
     a.risks=['创业失败导致财务损失','收入不稳定，压力大','需要投入大量时间和精力'];
     a.opportunities=['可能获得远超打工的收入','实现个人价值和理想'];
-    a.nextSteps=['制定详细商业计划','验证市场需求','建立至少12个月生活储备金','考虑先做副业验证'];
+    a.nextSteps=['制定详细商业计划','验证市场需求','建立至少 12 个月生活储备金','考虑先做副业验证'];
     a.reevaluate=['如果找到可靠合伙人','如果获得明确客户或订单','如果财务状况进一步改善']
   }else if(q.includes('辞职')||q.includes('离职')){
     const runway=s.netWorth/s.monthlyExpense;
     a.score=runway>=12?50:25;
     a.conclusion=runway>=12?'可以辞职，但需要有明确下一步计划':'强烈建议暂缓，先找到下家再辞职';
-    a.reasons=['存款可支撑'+runway.toFixed(1)+'个月，'+(runway>=12?'暂时安全':'非常危险'),'辞职后收入归零','重新求职可能需要3-6个月'];
+    a.mainProblem=runway<12?'存款不足以支撑长期求职，辞职风险极高':'需要明确辞职后的下一步计划';
+    a.reasons=['存款可支撑'+runway.toFixed(1)+'个月，'+(runway>=12?'暂时安全':'非常危险'),'辞职后收入归零','重新求职可能需要 3-6 个月'];
     a.support=['摆脱不满意的工作环境','有时间思考和调整','心理健康可能改善'];
     a.against=['收入完全中断','简历出现空窗期','求职市场竞争激烈'];
     a.risks=['长期找不到工作，存款耗尽','简历空窗期影响未来求职','心理压力可能比现在更大'];
     a.opportunities=['有时间学习新技能','可能找到更适合的方向'];
-    a.nextSteps=['确保至少有12个月生活费储备','先找到下家再辞职','更新简历，开始接触机会'];
-    a.reevaluate=['如果存款足够支撑12个月以上','如果已经有明确的下一步计划','如果当前工作严重影响健康']
+    a.nextSteps=['确保至少有 12 个月生活费储备','先找到下家再辞职','更新简历，开始接触机会'];
+    a.reevaluate=['如果存款足够支撑 12 个月以上','如果已经有明确的下一步计划','如果当前工作严重影响健康']
   }else if(q.includes('提前还贷')){
     a.score=nw>userData.debt*1.5?55:35;
     a.conclusion=nw>userData.debt*1.5?'可以考虑，但需要权衡投资收益':'建议保留现金，优先保持流动性';
+    a.mainProblem='需要平衡流动性安全和利息节省';
     a.reasons=['净资产'+fmt(nw)+'元，负债'+fmt(userData.debt)+'元','提前还贷减少利息','但会降低流动性'];
     a.support=['减少总利息支出','减轻心理负担','提高净资产'];
     a.against=['失去流动性','可能错过更好投资机会','如果利率低，不一定划算'];
     a.risks=['失去流动性，应急能力下降','可能错过更好的投资机会'];
     a.opportunities=['减少利息支出','提高财务安全感'];
-    a.nextSteps=['确认贷款利率和投资收益率','确保保留至少6个月应急储备','考虑部分提前还贷'];
+    a.nextSteps=['确认贷款利率和投资收益率','确保保留至少 6 个月应急储备','考虑部分提前还贷'];
     a.reevaluate=['如果贷款利率明显高于投资收益率','如果财务状况进一步改善']
   }else if(q.includes('投资')||q.includes('理财')){
     const em=s.emergencyMonths;
     a.score=em>=6?60:30;
     a.conclusion=em>=6?'可以开始投资，但需要先建立安全垫':'建议暂缓投资，先建立应急储备';
+    a.mainProblem=em<6?'应急储备不足，投资会进一步降低财务安全性':'需要学习基础投资知识，避免盲目投资';
     a.reasons=['应急储备'+em.toFixed(1)+'个月，'+(em>=6?'基本安全':'不够安全'),'投资需要长期不用的闲钱','当前净资产'+fmt(nw)+'元'];
     a.support=['长期复利效应显著','对抗通胀','建立被动收入'];
     a.against=['短期可能亏损','需要学习成本','如果急用钱可能被迫割肉'];
     a.risks=['投资亏损风险','缺乏知识导致失误','急用钱时被迫卖出'];
-    a.opportunities=['长期年化5-10%的复利增长','建立被动收入体系'];
-    a.nextSteps=['先存够6个月应急储备','学习基础投资知识（指数基金、债券）','从小额定投开始实践'];
-    a.reevaluate=['如果应急储备充足','如果有3年以上不用的闲钱','如果已学习基本投资知识']
+    a.opportunities=['长期年化 5-10% 的复利增长','建立被动收入体系'];
+    a.nextSteps=['先存够 6 个月应急储备','学习基础投资知识（指数基金、债券）','从小额定投开始实践'];
+    a.reevaluate=['如果应急储备充足','如果有 3 年以上不用的闲钱','如果已学习基本投资知识']
   }else if(q.includes('城市')||q.includes('搬家')){
     a.score=50;
     a.conclusion='需要综合评估，关键看职业机会和生活成本的变化';
+    a.mainProblem='城市选择会影响职业发展、生活质量和社交网络';
     a.reasons=['城市选择影响职业发展和生活质量','需要考虑收入变化、生活成本、社交网络','当前净资产'+fmt(nw)+'元，搬迁有一定成本'];
     a.support=['可能获得更好的职业机会','生活环境改善','新的社交和人脉'];
     a.against=['失去现有社交网络','搬迁成本','新城市需要重新适应'];
@@ -537,21 +599,23 @@ function generateDecisionAnalysis(q){
     a.opportunities=['接触更好的职业机会','生活质量和视野提升'];
     a.nextSteps=['对比两个城市的收入和 living cost','了解目标城市的行业机会','先去目标城市短期体验'];
     a.reevaluate=['如果目标城市有明确的工作机会','如果生活成本差异显著','如果当前城市发展空间有限']
-  }else if(q.includes('5年')||q.includes('未来')){
+  }else if(q.includes('5 年')||q.includes('未来')){
     const ms=userData.income*.2;const ar=.05;
     const fv=nw*Math.pow(1+ar,5)+ms*12*((Math.pow(1+ar,5)-1)/ar);
     a.score=60;
-    a.conclusion='按当前趋势，5年后资产约'+fmt(fv)+'元';
-    a.reasons=['当前净资产'+fmt(nw)+'元','假设每月储蓄'+fmt(ms)+'元（收入20%）','假设年化收益率5%'];
+    a.conclusion='按当前趋势，5 年后资产约'+fmt(fv)+'元';
+    a.mainProblem='需要提高储蓄率或投资收益率，才能加速资产增长';
+    a.reasons=['当前净资产'+fmt(nw)+'元','假设每月储蓄'+fmt(ms)+'元（收入 20%）','假设年化收益率 5%'];
     a.support=['复利效应长期显著','稳定储蓄习惯是基础'];
     a.against=['收入增长可能不及预期','支出可能增加'];
     a.risks=['收入增长可能不及预期','支出可能增加','投资收益可能波动'];
     a.opportunities=['如果提高收入或降低支出，结果会更好','职业发展可能带来收入跃升'];
-    a.nextSteps=['提高储蓄率到30%以上','学习投资知识，提高收益率','投资自己，提升收入能力'];
+    a.nextSteps=['提高储蓄率到 30% 以上','学习投资知识，提高收益率','投资自己，提升收入能力'];
     a.reevaluate=['如果收入发生重大变化','如果支出结构改变','如果投资环境变化']
   }else{
     a.score=50;
     a.conclusion='需要更多信息才能给出明确建议';
+    a.mainProblem='问题描述不够具体，无法给出针对性建议';
     a.reasons=['当前状况：年龄'+userData.age+'岁，月收入'+fmt(userData.income)+'元','净资产'+fmt(nw)+'元','综合评分'+s.overall+'分'];
     a.support=['有基本数据可以分析'];
     a.against=['缺少关键信息'];
@@ -563,31 +627,58 @@ function generateDecisionAnalysis(q){
   return a
 }
 
-// ===== 显示决策详情 =====
+// ===== 显示决策详情（结论优先） =====
 function showDecisionDetail(d){
   const det=document.getElementById('decisionDetail');
   const list=document.getElementById('decisionList');
   list.style.display='none';det.style.display='block';
   const a=d.analysis;
   const scoreColor=a.score>=60?'var(--success)':a.score>=40?'var(--warning)':'var(--danger)';
+  const scoreLabel=a.score>=70?'倾向肯定':a.score>=50?'中性建议':a.score>=30?'倾向否定':'强烈不建议';
+  
   det.innerHTML='<button class="btn btn-secondary" onclick="hideDecisionDetail()" style="margin-bottom:16px">← 返回列表</button>'+
-    '<div class="decision-detail"><h2 style="font-size:18px;margin-bottom:12px">'+d.question+'</h2>'+
-    '<div style="text-align:center;margin-bottom:16px"><div style="font-size:48px;font-weight:700;color:'+scoreColor+'">'+a.score+'</div><div style="font-size:13px;color:var(--text-light)">决策评分（0-100）</div></div>'+
-    sec('💡 结论',a.conclusion)+
-    sec('📊 关键原因',a.reasons)+
-    sec('✅ 支持理由',a.support)+
-    sec('❌ 反对理由',a.against)+
+    '<div class="decision-detail">'+
+    '<h2 style="font-size:18px;margin-bottom:16px">'+d.question+'</h2>'+
+    
+    // 结论区（最突出）
+    '<div style="background:'+scoreColor+'15;border-left:4px solid '+scoreColor+';padding:16px;border-radius:8px;margin-bottom:20px">'+
+    '<div style="font-size:13px;color:var(--text-light);margin-bottom:4px">【结论】</div>'+
+    '<div style="font-size:16px;font-weight:600;color:'+scoreColor+';margin-bottom:8px">'+a.conclusion+'</div>'+
+    '<div style="display:flex;align-items:center;gap:12px">'+
+    '<div style="font-size:32px;font-weight:700;color:'+scoreColor+'">'+a.score+'</div>'+
+    '<div><div style="font-size:12px;color:var(--text-light)">决策评分</div><div style="font-size:14px;font-weight:600">'+scoreLabel+'</div></div>'+
+    '</div></div>'+
+    
+    // 你现在最大的问题
+    (a.mainProblem?sec('🎯 你现在最大的问题',a.mainProblem):'')+
+    
+    // 关键原因
+    sec('📊 关键原因（最多 3 条）',a.reasons)+
+    
+    // 最大风险
     sec('⚠️ 最大风险',a.risks)+
+    
+    // 最大机会
     sec('🚀 最大机会',a.opportunities)+
-    sec('📋 下一步',a.nextSteps)+
-    sec('🔄 重新判断条件',a.reevaluate)+
-    '<div class="disclaimer">⚠️ AI提供分析，不替用户做最终决定。请结合自身实际情况判断。</div>'+
+    
+    // 建议
+    sec(' 建议（下一步做什么）',a.nextSteps)+
+    
+    // 重新判断条件
+    sec('🔄 重新判断条件（什么情况下改变结论）',a.reevaluate)+
+    
+    // 复盘按钮
+    '<div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">'+
+    '<button class="review-btn" onclick="reviewDecision('+d.id+')">📝 复盘这个决策</button>'+
+    '</div>'+
+    
+    '<div class="disclaimer">⚠️ AI 提供分析，不替用户做最终决定。请结合自身实际情况判断。</div>'+
     '</div>'
 }
 function sec(title,content){
-  if(!content||content.length===0)return'';
+  if(!content||(typeof content==='string'&&!content)||(Array.isArray(content)&&content.length===0))return'';
   let html='<div class="decision-section"><div class="decision-section-title">'+title+'</div><div class="decision-section-content">';
-  if(typeof content==='string'){html+=content}
+  if(typeof content==='string'){html+='<p style="margin:0">'+content+'</p>'}
   else{html+='<ul>'+content.map(c=>'<li>'+c+'</li>').join('')+'</ul>'}
   return html+'</div></div>'
 }
@@ -599,10 +690,26 @@ function updateDecisionList(){
   }
   list.innerHTML=userData.decisions.map(d=>{
     const sc=d.analysis.score;const scColor=sc>=60?'var(--success)':sc>=40?'var(--warning)':'var(--danger)';
-    return'<div class="decision-card" onclick="showDecisionDetailById('+d.id+')"><div class="decision-question">'+d.question+'</div><div class="decision-score" style="background:'+scColor+'20;color:'+scColor+'">决策评分：'+sc+'</div><div class="decision-answer">'+d.analysis.conclusion+'</div><div class="decision-meta"><span>'+new Date(d.createdAt).toLocaleDateString('zh-CN')+'</span><span>查看详情 →</span></div></div>'
+    const statusBadge=d.status==='reviewed'?'<span style="font-size:11px;color:var(--success)">✓ 已复盘</span>':'';
+    return'<div class="decision-card" onclick="showDecisionDetailById('+d.id+')"><div class="decision-question">'+d.question+'</div><div class="decision-score" style="background:'+scColor+'20;color:'+scColor+'">决策评分：'+sc+'</div><div class="decision-answer">'+d.analysis.conclusion+'</div><div class="decision-meta"><span>'+new Date(d.createdAt).toLocaleDateString('zh-CN')+'</span><span>查看详情 → '+statusBadge+'</span></div></div>'
   }).join('')
 }
 function showDecisionDetailById(id){const d=userData.decisions.find(x=>x.id===id);if(d)showDecisionDetail(d)}
+
+// ===== 复盘功能 =====
+function reviewDecision(id){
+  const d=userData.decisions.find(x=>x.id===id);
+  if(!d)return;
+  const actualResult=prompt('实际结果如何？（例如：换了工作，薪资涨了 30%）');
+  if(actualResult){
+    d.review={actualResult,reviewedAt:Date.now()};
+    d.status='reviewed';
+    saveUserData();
+    alert('复盘已保存！');
+    hideDecisionDetail();
+    updateDecisionList()
+  }
+}
 
 // ===== 模拟未来 =====
 function updateSimulation(){
@@ -621,20 +728,17 @@ function updateSimulation(){
   const baseMS=userData.income-baseME;
   const baseNW=userData.savings-userData.debt;
 
-  // 调整后的值
   const adjIncome=userData.income*(1+ic);
   const adjExpense=baseME*(1+ec);
-  const adjMortgage=baseME*.4*(1+mc);// 假设月供占支出40%
-  const adjOtherExpense=adjExpense-adjMortgage+(baseME*.4);// 其他支出+原月供
-  const adjMS=adjIncome*(1-sr)-adjOtherExpense*(1-sr);// 简化：储蓄率作用于总收入
-  const adjSaving=adjIncome*sr;// 用储蓄率直接算
+  const adjMortgage=baseME*.4*(1+mc);
+  const adjOtherExpense=adjExpense-adjMortgage+(baseME*.4);
+  const adjMS=adjIncome*(1-sr)-adjOtherExpense*(1-sr);
+  const adjSaving=adjIncome*sr;
 
-  // 基准（什么都不改变）
   const b1=baseNW*1.05+baseMS*12;
   const b3=baseNW*Math.pow(1.05,3)+baseMS*12*((Math.pow(1.05,3)-1)/.05);
   const b5=baseNW*Math.pow(1.05,5)+baseMS*12*((Math.pow(1.05,5)-1)/.05);
 
-  // 调整后
   const a1=baseNW*(1+ir)+adjSaving*12;
   const a3=baseNW*Math.pow(1+ir,3)+adjSaving*12*((Math.pow(1+ir,3)-1)/ir);
   const a5=baseNW*Math.pow(1+ir,5)+adjSaving*12*((Math.pow(1+ir,5)-1)/ir);
@@ -649,7 +753,6 @@ function updateSimulation(){
 
   setChange('asset1YearChange',c1);setChange('asset3YearChange',c3);setChange('asset5YearChange',c5);
 
-  // 识别关键变量
   const impacts=[
     {name:'收入增长',impact:Math.abs(parseFloat(c5)*ic)},
     {name:'支出控制',impact:Math.abs(parseFloat(c5)*ec)},
@@ -660,7 +763,6 @@ function updateSimulation(){
   impacts.sort((a,b)=>b.impact-a.impact);
   document.getElementById('keyVariable').textContent=impacts[0].name;
 
-  // A/B 对比
   document.getElementById('abBase').textContent=fmt(b5);
   document.getElementById('abBestTitle').textContent='如果'+impacts[0].name;
   document.getElementById('abBest').textContent=fmt(a5);
@@ -673,18 +775,17 @@ function updateActionPage(){
   const actions=generateActions();
   const taskList=document.getElementById('taskList');
   if(!userData.actions||userData.actions.length===0){
-    // 初始化行动
-    userData.actions=actions.map((a,i)=>({id:Date.now()+i,title:a,status:'pending',createdAt:Date.now()}));
+    userData.actions=actions.map((a,i)=>({id:Date.now()+i,title:a.title,priority:a.priority,due:a.due,status:'pending',createdAt:Date.now()}));
     saveUserData()
   }
   if(userData.actions.length===0){
-    taskList.innerHTML='<li class="empty-state"><div class="empty-state-icon">📋</div><div class="empty-state-title">还没有行动计划</div><div class="empty-state-text">完成第一次分析后，会为你生成90天行动计划</div></li>';return
+    taskList.innerHTML='<li class="empty-state"><div class="empty-state-icon">📋</div><div class="empty-state-title">还没有行动计划</div><div class="empty-state-text">完成第一次分析后，会为你生成 90 天行动计划</div></li>';return
   }
   taskList.innerHTML=userData.actions.map((t,i)=>{
     const cls=t.status==='completed'?'completed':t.status==='postponed'?'postponed':t.status==='abandoned'?'abandoned':'';
     const checked=t.status==='completed'?'checked':'';
     const statusLabel=t.status==='completed'?'<span class="action-status status-done">已完成</span>':t.status==='postponed'?'<span class="action-status status-later">已延后</span>':t.status==='abandoned'?'<span class="action-status status-skip">已放弃</span>':'';
-    return'<li class="task-item '+cls+'"><div class="task-checkbox '+checked+'" onclick="toggleTask('+i+')"></div><div class="task-content"><div class="task-title">'+t.title+'</div><div class="task-due">90天内完成 '+statusLabel+'</div></div><div class="task-actions"><button class="task-action" onclick="setTaskStatus('+i+',\'postponed\')">延后</button><button class="task-action" onclick="setTaskStatus('+i+',\'abandoned\')">放弃</button></div></li>'
+    return'<li class="task-item '+cls+'"><div class="task-checkbox '+checked+'" onclick="toggleTask('+i+')"></div><div class="task-content"><div class="task-title">'+t.title+'</div><div class="task-due"><span class="action-priority">'+t.priority+'</span> '+t.due+' '+statusLabel+'</div></div><div class="task-actions"><button class="task-action" onclick="setTaskStatus('+i+',\'postponed\')">延后</button><button class="task-action" onclick="setTaskStatus('+i+',\'abandoned\')">放弃</button></div></li>'
   }).join('')
 }
 function toggleTask(i){
@@ -701,7 +802,6 @@ function setTaskStatus(i,status){
 // ===== 个人资料 =====
 function updateProfile(){
   document.getElementById('profileBasic').innerHTML='<div style="display:grid;gap:12px"><div><strong>年龄：</strong>'+userData.age+'岁</div><div><strong>月收入：</strong>'+userData.income.toLocaleString()+'元</div><div><strong>可用资产：</strong>'+userData.savings.toLocaleString()+'元</div><div><strong>当前负债：</strong>'+userData.debt.toLocaleString()+'元</div><div><strong>净资产：</strong>'+(userData.savings-userData.debt).toLocaleString()+'元</div><div><strong>当前关注：</strong>'+getProblemLabel(userData.currentProblem)+'</div></div>';
-  // 详细资料
   let detail='<div style="display:grid;gap:8px">';
   if(userData.industry)detail+='<div><strong>行业：</strong>'+userData.industry+'</div>';
   if(userData.workYears)detail+='<div><strong>工作年限：</strong>'+userData.workYears+'</div>';
@@ -714,11 +814,13 @@ function updateProfile(){
   detail+='</div>';
   if(detail==='<div style="display:grid;gap:8px"></div>')detail='<div style="color:var(--text-light);font-size:14px">在决策过程中会自动补充</div>';
   document.getElementById('profileDetail').innerHTML=detail;
-  // 历史决策
   if(!userData.decisions||userData.decisions.length===0){
-    document.getElementById('profileDecisions').innerHTML='<div style="color:var(--text-light);font-size:14px">还没有做过决策</div>'
+    document.getElementById('profileDecisions').innerHTML='<div style="color:var(--text-light);font-size:14px">完成第一次分析后，这里会显示历史决策</div>'
   }else{
-    document.getElementById('profileDecisions').innerHTML='<div style="display:grid;gap:8px">'+userData.decisions.slice(0,5).map(d=>'<div style="padding:12px;background:var(--bg);border-radius:8px"><div style="font-weight:500">'+d.question+'</div><div style="font-size:12px;color:var(--text-light);margin-top:4px">'+new Date(d.createdAt).toLocaleDateString('zh-CN')+'</div></div>').join('')+'</div>'
+    document.getElementById('profileDecisions').innerHTML='<div style="display:grid;gap:8px">'+userData.decisions.slice(0,5).map(d=>{
+      const reviewBadge=d.status==='reviewed'?'<div style="font-size:11px;color:var(--success);margin-top:4px">✓ 已复盘</div>':'';
+      return'<div style="padding:12px;background:var(--bg);border-radius:8px"><div style="font-weight:500">'+d.question+'</div><div style="font-size:12px;color:var(--text-light);margin-top:4px">'+new Date(d.createdAt).toLocaleDateString('zh-CN')+'</div>'+reviewBadge+'</div>'
+    }).join('')+'</div>'
   }
 }
 function getProblemLabel(p){const m={career:'工作/收入',finance:'财务/理财',house:'房子/房贷',change:'换工作/创业',family:'家庭',direction:'人生方向',lost:'不知道下一步怎么办'};return m[p]||p}
