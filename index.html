@@ -2,151 +2,341 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>LifePath AI - 人生重大决策助手</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-:root{--primary:#2563eb;--primary-dark:#1e40af;--success:#10b981;--warning:#f59e0b;--danger:#ef4444;--bg:#f8fafc;--card:#fff;--text:#1e293b;--text-light:#64748b;--border:#e2e8f0;--shadow:0 1px 3px rgba(0,0,0,.1)}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;padding-bottom:70px}
-.header{background:var(--card);border-bottom:1px solid var(--border);padding:16px 20px;position:sticky;top:0;z-index:100}
-.header h1{font-size:20px;font-weight:600;color:var(--primary)}
-.header p{font-size:13px;color:var(--text-light);margin-top:4px}
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--border);display:flex;justify-content:space-around;padding:8px 0;z-index:100}
-.nav-item{display:flex;flex-direction:column;align-items:center;padding:8px 16px;cursor:pointer;border:none;background:none;color:var(--text-light);font-size:12px}
-.nav-item.active{color:var(--primary)}
-.nav-icon{font-size:24px;margin-bottom:4px}
-.page{display:none;padding:20px;max-width:800px;margin:0 auto}
+/* ===== CSS Reset & Base ===== */
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --primary:#2563eb;
+  --primary-dark:#1e40af;
+  --success:#10b981;
+  --warning:#f59e0b;
+  --danger:#ef4444;
+  --bg:#f8fafc;
+  --card:#fff;
+  --text:#1e293b;
+  --text-light:#64748b;
+  --border:#e2e8f0;
+  --shadow:0 1px 3px rgba(0,0,0,.08);
+  --safe-top:env(safe-area-inset-top,0);
+  --safe-bottom:env(safe-area-inset-bottom,0);
+  --nav-height:64px;
+}
+html,body{height:100%;overflow-x:hidden}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.6;
+  font-size:15px;
+  padding-bottom:calc(var(--nav-height) + var(--safe-bottom));
+  -webkit-font-smoothing:antialiased;
+}
+input,textarea,button{font-family:inherit;font-size:inherit}
+
+/* ===== Layout ===== */
+.container{max-width:430px;margin:0 auto;padding:0 16px}
+.page{display:none;padding:16px;max-width:430px;margin:0 auto}
 .page.active{display:block}
-.card{background:var(--card);border-radius:12px;padding:20px;margin-bottom:16px;box-shadow:var(--shadow)}
+
+/* ===== Header ===== */
+.header{
+  background:var(--card);
+  padding:12px 16px;
+  padding-top:calc(12px + var(--safe-top));
+  position:sticky;
+  top:0;
+  z-index:100;
+  border-bottom:1px solid var(--border);
+}
+.header h1{font-size:18px;font-weight:600;color:var(--primary)}
+.header p{font-size:13px;color:var(--text-light);margin-top:2px}
+
+/* ===== Bottom Navigation ===== */
+.bottom-nav{
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  background:rgba(255,255,255,.95);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  border-top:1px solid var(--border);
+  display:flex;
+  justify-content:space-around;
+  padding:8px 0;
+  padding-bottom:calc(8px + var(--safe-bottom));
+  z-index:100;
+}
+.nav-item{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:6px 12px;
+  cursor:pointer;
+  border:none;
+  background:none;
+  color:var(--text-light);
+  font-size:11px;
+  min-width:60px;
+}
+.nav-item.active{color:var(--primary)}
+.nav-icon{font-size:22px;margin-bottom:2px}
+
+/* ===== Cards ===== */
+.card{
+  background:var(--card);
+  border-radius:14px;
+  padding:16px;
+  margin-bottom:12px;
+  box-shadow:var(--shadow);
+}
 .card-title{font-size:16px;font-weight:600;margin-bottom:12px}
-.btn{padding:12px 24px;border-radius:8px;border:none;font-size:14px;font-weight:500;cursor:pointer;transition:all .2s}
+
+/* ===== Buttons ===== */
+.btn{
+  padding:14px 24px;
+  border-radius:10px;
+  border:none;
+  font-size:15px;
+  font-weight:500;
+  cursor:pointer;
+  transition:all .2s;
+  min-height:48px;
+}
 .btn-primary{background:var(--primary);color:#fff}
-.btn-primary:hover{background:var(--primary-dark)}
+.btn-primary:active{background:var(--primary-dark)}
 .btn-secondary{background:var(--bg);color:var(--text);border:1px solid var(--border)}
 .btn-block{width:100%}
-.form-group{margin-bottom:20px}
-.form-label{display:block;font-size:14px;font-weight:500;margin-bottom:8px}
-.form-input{width:100%;padding:12px;border:1px solid var(--border);border-radius:8px;font-size:14px}
+
+/* ===== Forms ===== */
+.form-group{margin-bottom:16px}
+.form-label{display:block;font-size:14px;font-weight:500;margin-bottom:6px}
+.form-input{
+  width:100%;
+  padding:12px;
+  border:1px solid var(--border);
+  border-radius:10px;
+  font-size:15px;
+  background:var(--card);
+}
 .form-input:focus{outline:none;border-color:var(--primary)}
-.score-circle{width:120px;height:120px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:32px;font-weight:700;color:#fff}
-.score-high{background:var(--success)}.score-medium{background:var(--warning)}.score-low{background:var(--danger)}
-.dimension-scores{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:16px}
-.dimension-item{display:flex;justify-content:space-between;align-items:center;padding:12px;background:var(--bg);border-radius:8px}
-.dimension-label{font-size:14px;color:var(--text-light)}
-.dimension-value{font-size:18px;font-weight:600}
-.problem-card{background:linear-gradient(135deg,#fef3c7,#fde68a);border-radius:12px;padding:20px;margin-bottom:16px}
-.problem-title{font-size:14px;color:#92400e;margin-bottom:8px}
-.problem-text{font-size:16px;font-weight:600;color:#78350f}
+
+/* ===== Score Circle ===== */
+.score-circle{
+  width:100px;
+  height:100px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin:0 auto 12px;
+  font-size:28px;
+  font-weight:700;
+  color:#fff;
+}
+.score-high{background:var(--success)}
+.score-medium{background:var(--warning)}
+.score-low{background:var(--danger)}
+
+/* ===== Dimension Scores ===== */
+.dimension-scores{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px}
+.dimension-item{display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--bg);border-radius:8px}
+.dimension-label{font-size:13px;color:var(--text-light)}
+.dimension-value{font-size:16px;font-weight:600}
+
+/* ===== Problem Card ===== */
+.problem-card{
+  background:linear-gradient(135deg,#fef3c7,#fde68a);
+  border-radius:14px;
+  padding:16px;
+  margin-bottom:12px;
+}
+.problem-title{font-size:13px;color:#92400e;margin-bottom:6px}
+.problem-text{font-size:15px;font-weight:600;color:#78350f}
+
+/* ===== Action List ===== */
 .action-list{list-style:none}
-.action-item{display:flex;align-items:flex-start;padding:12px;background:var(--bg);border-radius:8px;margin-bottom:8px}
-.action-number{width:24px;height:24px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;margin-right:12px;flex-shrink:0}
+.action-item{display:flex;align-items:flex-start;padding:12px;background:var(--bg);border-radius:10px;margin-bottom:8px}
+.action-number{width:22px;height:22px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;margin-right:10px;flex-shrink:0}
 .action-text{flex:1;font-size:14px}
-.action-priority{font-size:11px;padding:2px 8px;border-radius:4px;margin-left:8px;background:var(--primary);color:#fff}
-.action-due{font-size:11px;color:var(--text-light);margin-top:4px}
-.action-status{font-size:12px;padding:2px 8px;border-radius:4px;margin-left:8px;cursor:pointer}
-.status-done{background:#d1fae5;color:#065f46}
-.status-later{background:#fef3c7;color:#92400e}
-.status-skip{background:#fee2e2;color:#991b1b}
+.action-priority{font-size:10px;padding:2px 6px;border-radius:4px;margin-left:8px;background:var(--primary);color:#fff}
+
+/* ===== Input Area ===== */
 .input-area{position:relative}
-.input-area textarea{width:100%;padding:16px;padding-right:60px;border:1px solid var(--border);border-radius:12px;font-size:14px;resize:none;min-height:80px;font-family:inherit}
+.input-area textarea{
+  width:100%;
+  padding:14px;
+  padding-right:50px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  font-size:15px;
+  resize:none;
+  min-height:120px;
+  font-family:inherit;
+  background:var(--card);
+}
 .input-area textarea:focus{outline:none;border-color:var(--primary)}
-.input-area button{position:absolute;right:12px;bottom:12px;width:40px;height:40px;border-radius:50%;background:var(--primary);color:#fff;border:none;cursor:pointer;font-size:20px}
-.quick-questions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
-.quick-question{padding:8px 16px;background:var(--bg);border:1px solid var(--border);border-radius:20px;font-size:13px;cursor:pointer;transition:all .2s}
-.quick-question:hover{background:var(--primary);color:#fff;border-color:var(--primary)}
-.decision-card{background:var(--card);border-radius:12px;padding:16px;margin-bottom:12px;border:1px solid var(--border);cursor:pointer;transition:all .2s}
-.decision-card:hover{box-shadow:0 4px 12px rgba(0,0,0,.1)}
-.decision-question{font-size:15px;font-weight:600;margin-bottom:8px}
-.decision-answer{font-size:14px;color:var(--text-light);margin-bottom:8px}
-.decision-score{display:inline-block;padding:4px 12px;border-radius:12px;font-size:13px;font-weight:600;margin-bottom:8px}
-.decision-meta{display:flex;justify-content:space-between;font-size:12px;color:var(--text-light)}
-.decision-detail{background:var(--card);border-radius:12px;padding:20px;margin-bottom:16px}
-.decision-section{margin-bottom:20px}
+.input-area button{
+  position:absolute;
+  right:10px;
+  bottom:10px;
+  width:36px;
+  height:36px;
+  border-radius:50%;
+  background:var(--primary);
+  color:#fff;
+  border:none;
+  cursor:pointer;
+  font-size:18px;
+}
+
+/* ===== Quick Questions ===== */
+.quick-questions{
+  display:flex;
+  flex-wrap:nowrap;
+  gap:8px;
+  margin-top:12px;
+  overflow-x:auto;
+  padding-bottom:4px;
+  -webkit-overflow-scrolling:touch;
+}
+.quick-questions::-webkit-scrollbar{display:none}
+.quick-question{
+  padding:8px 14px;
+  background:var(--bg);
+  border:1px solid var(--border);
+  border-radius:18px;
+  font-size:13px;
+  cursor:pointer;
+  white-space:nowrap;
+  flex-shrink:0;
+}
+.quick-question:active{background:var(--primary);color:#fff;border-color:var(--primary)}
+
+/* ===== Hero Input ===== */
+.hero-input{
+  background:linear-gradient(135deg,#eff6ff,#dbeafe);
+  border-radius:16px;
+  padding:16px;
+  margin-bottom:12px;
+  border:2px solid var(--primary);
+}
+.hero-input-title{font-size:16px;font-weight:700;color:var(--primary);margin-bottom:10px}
+
+/* ===== Decision Card ===== */
+.decision-card{background:var(--card);border-radius:12px;padding:14px;margin-bottom:10px;border:1px solid var(--border)}
+.decision-question{font-size:14px;font-weight:600;margin-bottom:6px}
+.decision-answer{font-size:13px;color:var(--text-light);margin-bottom:6px}
+.decision-score{display:inline-block;padding:3px 10px;border-radius:10px;font-size:12px;font-weight:600;margin-bottom:6px}
+.decision-meta{display:flex;justify-content:space-between;font-size:11px;color:var(--text-light)}
+
+/* ===== Decision Detail ===== */
+.decision-detail{background:var(--card);border-radius:14px;padding:16px;margin-bottom:12px}
+.decision-section{margin-bottom:16px}
 .decision-section-title{font-size:14px;font-weight:600;margin-bottom:8px}
-.decision-section-content{font-size:14px;color:var(--text-light);line-height:1.8}
+.decision-section-content{font-size:14px;color:var(--text-light);line-height:1.7}
 .decision-section-content ul{list-style:none;padding:0}
-.decision-section-content li{padding:6px 0 6px 20px;position:relative}
+.decision-section-content li{padding:5px 0 5px 18px;position:relative}
 .decision-section-content li::before{content:"•";position:absolute;left:0;color:var(--primary)}
-.simulation-controls{background:var(--bg);border-radius:12px;padding:16px;margin-bottom:16px}
-.simulation-slider{margin-bottom:16px}
-.simulation-slider label{display:flex;justify-content:space-between;font-size:14px;margin-bottom:8px}
-.simulation-slider input[type=range]{width:100%;height:6px;border-radius:3px;background:var(--border);outline:none;-webkit-appearance:none}
-.simulation-slider input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--primary);cursor:pointer}
-.simulation-result{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:16px}
-.simulation-item{background:var(--bg);border-radius:8px;padding:16px;text-align:center}
-.simulation-label{font-size:12px;color:var(--text-light);margin-bottom:4px}
-.simulation-value{font-size:20px;font-weight:700}
-.simulation-change{font-size:12px;margin-top:4px}
+
+/* ===== Simulation ===== */
+.simulation-controls{background:var(--bg);border-radius:12px;padding:14px;margin-bottom:12px}
+.simulation-slider{margin-bottom:14px}
+.simulation-slider label{display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px}
+.simulation-slider input[type=range]{width:100%;height:5px;border-radius:3px;background:var(--border);outline:none;-webkit-appearance:none}
+.simulation-slider input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--primary);cursor:pointer}
+.simulation-result{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px}
+.simulation-item{background:var(--bg);border-radius:10px;padding:12px;text-align:center}
+.simulation-label{font-size:11px;color:var(--text-light);margin-bottom:3px}
+.simulation-value{font-size:18px;font-weight:700}
+.simulation-change{font-size:11px;margin-top:3px}
 .simulation-change.positive{color:var(--success)}
 .simulation-change.negative{color:var(--danger)}
+
+/* ===== Task List ===== */
 .task-list{list-style:none}
-.task-item{display:flex;align-items:center;padding:16px;background:var(--card);border-radius:8px;margin-bottom:8px;border:1px solid var(--border)}
-.task-checkbox{width:24px;height:24px;border:2px solid var(--border);border-radius:4px;margin-right:12px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px}
+.task-item{display:flex;align-items:center;padding:14px;background:var(--card);border-radius:10px;margin-bottom:8px;border:1px solid var(--border)}
+.task-checkbox{width:22px;height:22px;border:2px solid var(--border);border-radius:4px;margin-right:10px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px}
 .task-checkbox.checked{background:var(--success);border-color:var(--success);color:#fff}
 .task-checkbox.checked::after{content:"✓"}
 .task-content{flex:1}
 .task-title{font-size:14px;font-weight:500}
-.task-due{font-size:12px;color:var(--text-light);margin-top:4px}
+.task-due{font-size:11px;color:var(--text-light);margin-top:3px}
 .task-actions{display:flex;gap:4px}
-.task-action{padding:4px 8px;border-radius:4px;font-size:11px;cursor:pointer;border:1px solid var(--border);background:var(--card)}
-.task-action:hover{background:var(--bg)}
+.task-action{padding:3px 8px;border-radius:4px;font-size:10px;cursor:pointer;border:1px solid var(--border);background:var(--card)}
 .task-item.completed .task-title{text-decoration:line-through;color:var(--text-light)}
 .task-item.postponed{opacity:.7}
 .task-item.postponed .task-title{text-decoration:line-through}
 .task-item.abandoned{opacity:.5}
-.task-item.abandoned .task-title{text-decoration:line-through}
-.empty-state{text-align:center;padding:60px 20px;color:var(--text-light)}
-.empty-state-icon{font-size:64px;margin-bottom:16px}
-.empty-state-title{font-size:18px;font-weight:600;margin-bottom:8px;color:var(--text)}
-.empty-state-text{font-size:14px}
-.hero-input{background:linear-gradient(135deg,#eff6ff,#dbeafe);border-radius:16px;padding:24px;margin-bottom:16px;border:2px solid var(--primary)}
-.hero-input-title{font-size:18px;font-weight:700;color:var(--primary);margin-bottom:12px;display:flex;align-items:center;gap:8px}
-.disclaimer{font-size:12px;color:var(--text-light);background:var(--bg);padding:12px;border-radius:8px;margin-top:16px;text-align:center;border:1px solid var(--border)}
-.progressive-form{background:var(--bg);border-radius:12px;padding:20px;margin-bottom:16px;border:1px solid var(--border)}
-.progressive-form h3{font-size:15px;font-weight:600;margin-bottom:12px}
-.ab-compare{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
-.ab-card{background:var(--bg);border-radius:12px;padding:16px;border:2px solid var(--border)}
+
+/* ===== Empty State ===== */
+.empty-state{text-align:center;padding:40px 20px;color:var(--text-light)}
+.empty-state-icon{font-size:48px;margin-bottom:12px}
+.empty-state-title{font-size:16px;font-weight:600;margin-bottom:6px;color:var(--text)}
+.empty-state-text{font-size:13px}
+
+/* ===== Disclaimer ===== */
+.disclaimer{font-size:11px;color:var(--text-light);background:var(--bg);padding:10px;border-radius:8px;margin-top:12px;text-align:center;border:1px solid var(--border)}
+.sim-disclaimer{font-size:11px;color:var(--warning);background:#fffbeb;padding:10px;border-radius:8px;margin-top:12px;border:1px solid #fde68a;text-align:center}
+
+/* ===== Progressive Form ===== */
+.progressive-form{background:var(--bg);border-radius:12px;padding:14px;margin-bottom:12px;border:1px solid var(--border)}
+.progressive-form h3{font-size:14px;font-weight:600;margin-bottom:10px}
+
+/* ===== Review Button ===== */
+.review-btn{padding:8px 14px;border-radius:6px;font-size:12px;cursor:pointer;border:1px solid var(--border);background:var(--card);margin-top:10px}
+
+/* ===== Pending Changes Card ===== */
+.pending-changes-card{background:#eff6ff;border:2px solid var(--primary);border-radius:12px;padding:14px;margin-bottom:12px}
+
+/* ===== AB Compare ===== */
+.ab-compare{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.ab-card{background:var(--bg);border-radius:10px;padding:12px;border:2px solid var(--border)}
 .ab-card.better{border-color:var(--success)}
-.ab-card.worse{border-color:var(--danger)}
-.ab-card-title{font-size:13px;font-weight:600;margin-bottom:8px;text-align:center}
-.ab-card-value{font-size:20px;font-weight:700;text-align:center;margin-bottom:4px}
-.ab-card-desc{font-size:12px;color:var(--text-light);text-align:center}
-.sim-disclaimer{font-size:12px;color:var(--warning);background:#fffbeb;padding:12px;border-radius:8px;margin-top:16px;border:1px solid #fde68a;text-align:center}
-.review-btn{padding:6px 12px;border-radius:4px;font-size:12px;cursor:pointer;border:1px solid var(--border);background:var(--card);margin-top:8px}
-.review-btn:hover{background:var(--bg)}
-@media(max-width:640px){.dimension-scores,.simulation-result,.ab-compare{grid-template-columns:1fr}}
+.ab-card-title{font-size:12px;font-weight:600;margin-bottom:6px;text-align:center}
+.ab-card-value{font-size:16px;font-weight:700;text-align:center;margin-bottom:3px}
+.ab-card-desc{font-size:11px;color:var(--text-light);text-align:center}
+
+/* ===== Responsive ===== */
+@media(min-width:768px){
+  .page{padding:24px}
+  .card{padding:20px}
+  .hero-input{padding:20px}
+  .input-area textarea{min-height:140px}
+}
 </style>
 </head>
 <body>
 <div class="header">
   <h1>LifePath AI</h1>
-  <p>看清你现在的问题，算清下一步怎么走</p>
+  <p>看清现在的问题，算清下一步怎么走</p>
 </div>
 
 <!-- 首次填写 -->
 <div id="onboarding" class="page active">
-  <!-- 主入口：问题输入 -->
-  <div class="hero-input" style="margin-bottom:24px">
+  <div class="hero-input">
     <div class="hero-input-title">🔥 我现在遇到一个问题</div>
     <div class="input-area">
-      <textarea id="onboardingQuestion" placeholder="例如：我 32 岁，月薪 1.5 万，存款 20 万，房贷 80 万，不知道该继续工作还是创业。" style="min-height:100px"></textarea>
+      <textarea id="onboardingQuestion" placeholder="比如：&#10;我 32 岁，月薪 1.5 万，存款 20 万，&#10;有 80 万房贷，不知道应该继续工作还是创业。"></textarea>
       <button onclick="submitOnboardingQuestion()">→</button>
     </div>
-    <div class="quick-questions" style="margin-top:12px">
+    <div class="quick-questions">
       <div class="quick-question" onclick="fillOnboardingQuestion('我要不要换工作？')">换工作</div>
       <div class="quick-question" onclick="fillOnboardingQuestion('我要不要买房？')">买房</div>
       <div class="quick-question" onclick="fillOnboardingQuestion('我要不要创业？')">创业</div>
       <div class="quick-question" onclick="fillOnboardingQuestion('我要不要辞职？')">辞职</div>
       <div class="quick-question" onclick="fillOnboardingQuestion('我要不要提前还贷？')">提前还贷</div>
       <div class="quick-question" onclick="fillOnboardingQuestion('我要不要投资？')">投资</div>
-      <div class="quick-question" onclick="fillOnboardingQuestion('我要不要去另一个城市？')">去其他城市</div>
     </div>
   </div>
   
-  <!-- 5 项基础信息（可选） -->
   <div class="card">
-    <h3 style="font-size:16px;margin-bottom:12px">第一次使用？补充 5 项基础信息</h3>
-    <p style="color:var(--text-light);font-size:13px;margin-bottom:16px">也可以直接在上面输入问题，AI 会自动提取信息</p>
+    <div style="font-size:14px;font-weight:600;margin-bottom:8px">第一次使用？补充基础信息</div>
+    <div style="font-size:13px;color:var(--text-light);margin-bottom:12px">也可以直接在上面输入问题，AI 会自动提取信息</div>
     <form id="onboardingForm">
       <div class="form-group"><label class="form-label">年龄</label><input type="number" class="form-input" id="ob_age" placeholder="例如：30" min="18" max="80"></div>
       <div class="form-group"><label class="form-label">月收入（税后）</label><input type="number" class="form-input" id="ob_income" placeholder="例如：15000" min="0"></div>
@@ -172,9 +362,27 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hira
 
 <!-- 首页 -->
 <div id="home" class="page">
+  <div class="hero-input">
+    <div class="hero-input-title">🔥 我现在遇到一个问题</div>
+    <div class="input-area">
+      <textarea id="questionInput" placeholder="比如：&#10;我 32 岁，月薪 1.5 万，存款 20 万，&#10;有 80 万房贷，不知道应该继续工作还是创业。"></textarea>
+      <button onclick="submitQuestion()">→</button>
+    </div>
+    <div style="font-size:12px;color:var(--text-light);margin-top:8px">你也可以直接问</div>
+    <div class="quick-questions">
+      <div class="quick-question" onclick="askQuick('我要不要换工作？')">换工作</div>
+      <div class="quick-question" onclick="askQuick('我要不要买房？')">买房</div>
+      <div class="quick-question" onclick="askQuick('我要不要创业？')">创业</div>
+      <div class="quick-question" onclick="askQuick('我要不要辞职？')">辞职</div>
+      <div class="quick-question" onclick="askQuick('我要不要提前还贷？')">提前还贷</div>
+      <div class="quick-question" onclick="askQuick('我要不要投资？')">投资</div>
+      <div class="quick-question" onclick="askQuick('我要不要去另一个城市？')">换城市</div>
+    </div>
+  </div>
+
   <div class="card">
     <div class="score-circle" id="overallScore"><span>--</span></div>
-    <div style="text-align:center;margin-bottom:16px"><div style="font-size:14px;color:var(--text-light)">综合状态</div></div>
+    <div style="text-align:center;margin-bottom:10px"><div style="font-size:13px;color:var(--text-light)">综合状态</div></div>
     <div class="dimension-scores">
       <div class="dimension-item"><span class="dimension-label">职业</span><span class="dimension-value" id="careerScore">--</span></div>
       <div class="dimension-item"><span class="dimension-label">财务</span><span class="dimension-value" id="financeScore">--</span></div>
@@ -182,42 +390,36 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hira
       <div class="dimension-item"><span class="dimension-label">成长</span><span class="dimension-value" id="growthScore">--</span></div>
     </div>
   </div>
+
   <div class="problem-card">
     <div class="problem-title">你现在最大的问题</div>
     <div class="problem-text" id="mainProblem">完成第一次分析后，这里会显示你的当前核心问题</div>
   </div>
+
   <div class="card">
     <div class="card-title">你现在最应该做</div>
     <ul class="action-list" id="topActions">
       <li class="action-item"><div class="action-number">1</div><div class="action-text">完成第一次分析后，这里会显示建议行动</div></li>
     </ul>
   </div>
-  <div class="hero-input">
-    <div class="hero-input-title">🔥 我现在遇到一个问题</div>
-    <div class="input-area">
-      <textarea id="questionInput" placeholder="直接说出你的问题，例如：&#10;我 32 岁，月薪 1.5 万，存款 20 万，房贷 80 万，不知道该继续工作还是创业。"></textarea>
-      <button onclick="submitQuestion()">→</button>
-    </div>
-    <div class="quick-questions" style="margin-top:12px">
-      <div class="quick-question" onclick="askQuick('我要不要换工作？')">换工作</div>
-      <div class="quick-question" onclick="askQuick('我要不要买房？')">买房</div>
-      <div class="quick-question" onclick="askQuick('我要不要创业？')">创业</div>
-      <div class="quick-question" onclick="askQuick('我要不要辞职？')">辞职</div>
-      <div class="quick-question" onclick="askQuick('我要不要提前还贷？')">提前还贷</div>
-      <div class="quick-question" onclick="askQuick('我要不要投资？')">投资</div>
-      <div class="quick-question" onclick="askQuick('我要不要去另一个城市？')">去其他城市</div>
-      <div class="quick-question" onclick="askQuick('如果什么都不改变，5 年后会怎样？')">5 年后会怎样</div>
-    </div>
-  </div>
 </div>
 
 <!-- 做决定 -->
 <div id="decide" class="page">
   <div class="card">
-    <div class="card-title">输入你的问题</div>
+    <div class="card-title">你现在想决定什么？</div>
     <div class="input-area">
-      <textarea id="decideInput" placeholder="例如：我要不要换工作？我要不要买房？"></textarea>
+      <textarea id="decideInput" placeholder="例如：&#10;我要不要换工作？&#10;我要不要买房？"></textarea>
       <button onclick="submitDecision()">→</button>
+    </div>
+    <div style="font-size:12px;color:var(--text-light);margin-top:8px">快捷选项</div>
+    <div class="quick-questions">
+      <div class="quick-question" onclick="setDecideInput('我要不要换工作？')">换工作</div>
+      <div class="quick-question" onclick="setDecideInput('我要不要买房？')">买房</div>
+      <div class="quick-question" onclick="setDecideInput('我要不要创业？')">创业</div>
+      <div class="quick-question" onclick="setDecideInput('我要不要辞职？')">辞职</div>
+      <div class="quick-question" onclick="setDecideInput('我要不要提前还贷？')">提前还贷</div>
+      <div class="quick-question" onclick="setDecideInput('我要不要投资？')">投资</div>
     </div>
   </div>
   <div id="progressiveArea"></div>
@@ -235,40 +437,34 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hira
 <div id="simulate" class="page">
   <div class="card">
     <div class="card-title">模拟你的未来</div>
-    <p style="color:var(--text-light);font-size:14px;margin-bottom:16px">调整变量，看看不同选择会如何影响你的未来</p>
     <div class="simulation-controls">
       <div class="simulation-slider"><label><span>收入变化</span><span id="incomeChangeValue">0%</span></label><input type="range" id="incomeChange" min="-50" max="100" value="0" oninput="updateSimulation()"></div>
       <div class="simulation-slider"><label><span>支出变化</span><span id="expenseChangeValue">0%</span></label><input type="range" id="expenseChange" min="-50" max="100" value="0" oninput="updateSimulation()"></div>
       <div class="simulation-slider"><label><span>储蓄率</span><span id="savingsRateValue">20%</span></label><input type="range" id="savingsRate" min="0" max="80" value="20" oninput="updateSimulation()"></div>
       <div class="simulation-slider"><label><span>投资回报（年化）</span><span id="investmentReturnValue">5%</span></label><input type="range" id="investmentReturn" min="0" max="20" value="5" oninput="updateSimulation()"></div>
-      <div class="simulation-slider"><label><span>房贷月供变化</span><span id="mortgageChangeValue">0%</span></label><input type="range" id="mortgageChange" min="-50" max="100" value="0" oninput="updateSimulation()"></div>
     </div>
     <div class="simulation-result">
       <div class="simulation-item"><div class="simulation-label">1 年后资产</div><div class="simulation-value" id="asset1Year">--</div><div class="simulation-change" id="asset1YearChange">--</div></div>
       <div class="simulation-item"><div class="simulation-label">3 年后资产</div><div class="simulation-value" id="asset3Year">--</div><div class="simulation-change" id="asset3YearChange">--</div></div>
       <div class="simulation-item"><div class="simulation-label">5 年后资产</div><div class="simulation-value" id="asset5Year">--</div><div class="simulation-change" id="asset5YearChange">--</div></div>
-      <div class="simulation-item"><div class="simulation-label">影响最大的变量</div><div class="simulation-value" id="keyVariable" style="font-size:14px">--</div></div>
+      <div class="simulation-item"><div class="simulation-label">影响最大的变量</div><div class="simulation-value" id="keyVariable" style="font-size:12px">--</div></div>
     </div>
-    <div class="sim-disclaimer">⚠️ 以上所有结果均为假设估算和情景模拟，不构成确定性预测。实际情况受多种因素影响。</div>
+    <div class="sim-disclaimer">⚠️ 以上所有结果均为假设估算和情景模拟，不构成确定性预测。</div>
   </div>
   <div class="card">
-    <div class="card-title">A/B 对比：不改变 vs 改变一个变量</div>
-    <p style="color:var(--text-light);font-size:14px;margin-bottom:12px">看看哪个变量对你的未来影响最大</p>
-    <div id="abCompare">
-      <div class="ab-compare">
-        <div class="ab-card"><div class="ab-card-title">什么都不改变</div><div class="ab-card-value" id="abBase">--</div><div class="ab-card-desc">5 年后资产（基准）</div></div>
-        <div class="ab-card better"><div class="ab-card-title" id="abBestTitle">--</div><div class="ab-card-value" id="abBest">--</div><div class="ab-card-desc" id="abBestDesc">--</div></div>
-      </div>
+    <div class="card-title">A/B 对比</div>
+    <div class="ab-compare">
+      <div class="ab-card"><div class="ab-card-title">什么都不改变</div><div class="ab-card-value" id="abBase">--</div><div class="ab-card-desc">5 年后资产</div></div>
+      <div class="ab-card better"><div class="ab-card-title" id="abBestTitle">--</div><div class="ab-card-value" id="abBest">--</div><div class="ab-card-desc" id="abBestDesc">--</div></div>
     </div>
-    <div class="sim-disclaimer" style="margin-top:12px">⚠️ 情景模拟，仅供参考，非确定性预测。</div>
+    <div class="sim-disclaimer" style="margin-top:10px">⚠️ 情景模拟，仅供参考。</div>
   </div>
 </div>
 
 <!-- 行动 -->
 <div id="action" class="page">
   <div class="card">
-    <div class="card-title">未来 90 天行动计划</div>
-    <p style="color:var(--text-light);font-size:14px;margin-bottom:16px">最多 5 件事情。可以标记完成、延后或放弃。</p>
+    <div class="card-title">未来 90 天</div>
     <ul class="task-list" id="taskList">
       <li class="empty-state"><div class="empty-state-icon">📋</div><div class="empty-state-title">还没有行动计划</div><div class="empty-state-text">完成第一次分析后，会为你生成 90 天行动计划</div></li>
     </ul>
@@ -277,51 +473,84 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hira
 
 <!-- 我的 -->
 <div id="profile" class="page">
-  <div class="card"><div class="card-title">基础信息</div><div id="profileBasic"><div style="color:var(--text-light);font-size:14px">完成第一次分析后，这里会显示你的基础信息</div></div></div>
-  <div class="card"><div class="card-title">详细资料</div><div id="profileDetail"><div style="color:var(--text-light);font-size:14px">可在后续使用中逐步补充</div></div></div>
-  <div class="card"><div class="card-title">历史决策</div><div id="profileDecisions"><div style="color:var(--text-light);font-size:14px">完成第一次分析后，这里会显示历史决策</div></div></div>
+  <div class="card">
+    <div class="card-title">我的状态</div>
+    <div id="profileBasic"><div style="color:var(--text-light);font-size:13px">完成第一次分析后，这里会显示你的基础信息</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">历史决策</div>
+    <div id="profileDecisions"><div style="color:var(--text-light);font-size:13px">完成第一次分析后，这里会显示历史决策</div></div>
+  </div>
   <button class="btn btn-secondary btn-block" onclick="exportData()">导出数据</button>
   <button class="btn btn-secondary btn-block" style="margin-top:8px" onclick="resetData()">重置所有数据</button>
 </div>
 
 <!-- 底部导航 -->
 <div class="bottom-nav">
-  <button class="nav-item active" onclick="switchPage('home',this)"><div class="nav-icon">🏠</div><div>首页</div></button>
-  <button class="nav-item" onclick="switchPage('decide',this)"><div class="nav-icon">💭</div><div>做决定</div></button>
-  <button class="nav-item" onclick="switchPage('simulate',this)"><div class="nav-icon"></div><div>模拟未来</div></button>
-  <button class="nav-item" onclick="switchPage('action',this)"><div class="nav-icon">✅</div><div>行动</div></button>
-  <button class="nav-item" onclick="switchPage('profile',this)"><div class="nav-icon">👤</div><div>我的</div></button>
+  <button class="nav-item active" onclick="switchPage('home',this)"><div class="nav-icon"></div><div>首页</div></button>
+  <button class="nav-item" onclick="switchPage('decide',this)"><div class="nav-icon">◎</div><div>决定</div></button>
+  <button class="nav-item" onclick="switchPage('simulate',this)"><div class="nav-icon">↗</div><div>模拟</div></button>
+  <button class="nav-item" onclick="switchPage('profile',this)"><div class="nav-icon">☻</div><div>我的</div></button>
 </div>
 
 <script>
 let userData=null;
-function init(){const s=localStorage.getItem('lifepath_user');if(s){userData=JSON.parse(s);showMainApp()}else{showOnboarding()}}
-function showOnboarding(){document.getElementById('onboarding').classList.add('active');document.getElementById('home').classList.remove('active');document.querySelector('.bottom-nav').style.display='none'}
-function showMainApp(){document.getElementById('onboarding').classList.remove('active');document.getElementById('home').classList.add('active');document.querySelector('.bottom-nav').style.display='flex';updateHomePage();updateSimulation();updateProfile();updateActionPage()}
+let userState=null;
+let eventLog=[];
+let pendingChanges=[];
 
-// 首次提交问题
+function init(){
+  const s=localStorage.getItem('lifepath_user');
+  if(s){
+    userData=JSON.parse(s);
+    if(!userData.userState)userData.userState=createDefaultState();
+    userState=userData.userState;
+    eventLog=userData.eventLog||[];
+    showMainApp();
+  }else{
+    showOnboarding();
+  }
+}
+
+function createDefaultState(){
+  return{
+    basic:{age:{value:30,updated_at:Date.now(),source:'user_input',confidence:'high'},city:{value:'未知',updated_at:Date.now(),source:'user_input',confidence:'low'},family_status:{value:'未知',updated_at:Date.now(),source:'user_input',confidence:'low'},children:{value:0,updated_at:Date.now(),source:'user_input',confidence:'low'}},
+    career:{employment_status:{value:'employed',updated_at:Date.now(),source:'user_input',confidence:'high'},industry:{value:'未知',updated_at:Date.now(),source:'user_input',confidence:'low'},occupation:{value:'未知',updated_at:Date.now(),source:'user_input',confidence:'low'},company:{value:'未知',updated_at:Date.now(),source:'user_input',confidence:'low'},work_years:{value:0,updated_at:Date.now(),source:'user_input',confidence:'low'},monthly_income:{value:15000,updated_at:Date.now(),source:'user_input',confidence:'high'},income_stability:{value:'stable',updated_at:Date.now(),source:'user_input',confidence:'medium'}},
+    finance:{available_assets:{value:200000,updated_at:Date.now(),source:'user_input',confidence:'high'},monthly_expense:{value:9000,updated_at:Date.now(),source:'calculated',confidence:'medium'},debt:{value:800000,updated_at:Date.now(),source:'user_input',confidence:'high'},mortgage:{value:800000,updated_at:Date.now(),source:'user_input',confidence:'high'},monthly_mortgage:{value:0,updated_at:Date.now(),source:'calculated',confidence:'low'},savings_rate:{value:0.4,updated_at:Date.now(),source:'calculated',confidence:'medium'}},
+    goals:{current_goal:{value:'未知',updated_at:Date.now(),source:'user_input',confidence:'low'},current_problem:{value:'lost',updated_at:Date.now(),source:'user_input',confidence:'medium'},career_goal:{value:'未知',updated_at:Date.now(),source:'user_input',confidence:'low'},financial_goal:{value:'未知',updated_at:Date.now(),source:'user_input',confidence:'low'}}
+  }
+}
+
+function showOnboarding(){document.getElementById('onboarding').classList.add('active');document.getElementById('home').classList.remove('active');document.querySelector('.bottom-nav').style.display='none'}
+
+function showMainApp(){
+  document.getElementById('onboarding').classList.remove('active');
+  document.getElementById('home').classList.add('active');
+  document.querySelector('.bottom-nav').style.display='flex';
+  updateHomePage();
+  updateSimulation();
+  updateProfile();
+  updateActionPage();
+  if(pendingChanges.length>0)showPendingChanges();
+}
+
 function submitOnboardingQuestion(){
   const text=document.getElementById('onboardingQuestion').value.trim();
   if(!text){alert('请输入你的问题');return}
   const parsed=parseNaturalLanguage(text);
-  userData={
-    age:parsed.age||30,
-    income:parsed.income||15000,
-    savings:parsed.savings||200000,
-    debt:parsed.debt||0,
-    currentProblem:parsed.problemType||'lost',
-    decisions:[],
-    actions:[],
-    createdAt:Date.now()
-  };
+  userData={age:parsed.age||30,income:parsed.income||15000,savings:parsed.savings||200000,debt:parsed.debt||800000,currentProblem:parsed.problemType||'lost',decisions:[],actions:[],createdAt:Date.now(),userState:createDefaultState(),eventLog:[]};
+  userState=userData.userState;
+  userState.basic.age.value=parsed.age||30;
+  userState.career.monthly_income.value=parsed.income||15000;
+  userState.finance.available_assets.value=parsed.savings||200000;
+  userState.finance.debt.value=parsed.debt||800000;
+  userState.goals.current_problem.value=parsed.problemType||'lost';
+  addEvent('initial_setup','用户首次设置',{age:userState.basic.age.value,income:userState.career.monthly_income.value,assets:userState.finance.available_assets.value,debt:userState.finance.debt.value});
   saveUserData();
   showMainApp();
-  setTimeout(()=>{
-    switchPage('decide',document.querySelectorAll('.nav-item')[1]);
-    document.getElementById('decideInput').value=text;
-    submitDecision();
-  },500);
+  setTimeout(()=>{switchPage('decide',document.querySelectorAll('.nav-item')[1]);document.getElementById('decideInput').value=text;submitDecision()},500);
 }
+
 function fillOnboardingQuestion(q){document.getElementById('onboardingQuestion').value=q}
 
 document.getElementById('onboardingForm').addEventListener('submit',function(e){
@@ -331,34 +560,51 @@ document.getElementById('onboardingForm').addEventListener('submit',function(e){
   const savings=parseInt(document.getElementById('ob_savings').value)||0;
   const debt=parseInt(document.getElementById('ob_debt').value)||0;
   const currentProblem=document.getElementById('ob_problem').value||'lost';
-  userData={age,income,savings,debt,currentProblem,decisions:[],actions:[],createdAt:Date.now()};
+  userData={age,income,savings,debt,currentProblem,decisions:[],actions:[],createdAt:Date.now(),userState:createDefaultState(),eventLog:[]};
+  userState=userData.userState;
+  userState.basic.age.value=age;
+  userState.career.monthly_income.value=income;
+  userState.finance.available_assets.value=savings;
+  userState.finance.debt.value=debt;
+  userState.goals.current_problem.value=currentProblem;
+  addEvent('manual_setup','用户手动填写基本信息',{age,income,savings,debt});
   saveUserData();
   showMainApp();
 });
 
-function saveUserData(){localStorage.setItem('lifepath_user',JSON.stringify(userData))}
-function switchPage(pageId,el){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));document.getElementById(pageId).classList.add('active');if(el)el.classList.add('active');if(pageId==='home')updateHomePage();if(pageId==='simulate')updateSimulation();if(pageId==='action')updateActionPage();if(pageId==='profile')updateProfile();if(pageId==='decide')updateDecisionList()}
+function saveUserData(){userData.userState=userState;userData.eventLog=eventLog;localStorage.setItem('lifepath_user',JSON.stringify(userData))}
 
-// ===== 评分计算 =====
-function calc(){
-  const nw=userData.savings-userData.debt;
-  const me=userData.income*0.6;
-  const ms=userData.income-me;
-  const em=nw/me;
-  let fs=50;if(nw>0)fs+=20;if(em>=6)fs+=20;if(ms>0)fs+=10;fs=Math.min(100,Math.max(0,fs));
-  let cs=60;if(userData.age<35)cs+=10;if(userData.income>15000)cs+=10;cs=Math.min(100,Math.max(0,cs));
-  let fam=70;
-  let gs=65;if(userData.age<40)gs+=10;gs=Math.min(100,Math.max(0,gs));
-  const ov=Math.round(cs*.3+fs*.4+fam*.15+gs*.15);
-  return{overall:ov,career:cs,finance:fs,family:fam,growth:gs,netWorth:nw,monthlyExpense:me,monthlySaving:ms,emergencyMonths:em}
+function switchPage(pageId,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById(pageId).classList.add('active');
+  if(el)el.classList.add('active');
+  if(pageId==='home')updateHomePage();
+  if(pageId==='simulate')updateSimulation();
+  if(pageId==='action')updateActionPage();
+  if(pageId==='profile')updateProfile();
+  if(pageId==='decide')updateDecisionList();
+  window.scrollTo(0,0);
 }
 
-// ===== 识别主要问题 =====
+function calc(){
+  const nw=userState.finance.available_assets.value-userState.finance.debt.value;
+  const me=userState.career.monthly_income.value*0.6;
+  const ms=userState.career.monthly_income.value-me;
+  const em=nw/me;
+  let fs=50;if(nw>0)fs+=20;if(em>=6)fs+=20;if(ms>0)fs+=10;fs=Math.min(100,Math.max(0,fs));
+  let cs=60;if(userState.basic.age.value<35)cs+=10;if(userState.career.monthly_income.value>15000)cs+=10;cs=Math.min(100,Math.max(0,cs));
+  let fam=70;
+  let gs=65;if(userState.basic.age.value<40)gs+=10;gs=Math.min(100,Math.max(0,gs));
+  const ov=Math.round(cs*.3+fs*.4+fam*.15+gs*.15);
+  return{overall:ov,career:cs,finance:fs,family:fam,growth:gs,netWorth:nw,monthlyExpense:me,monthlySaving:ms,emergencyMonths:em,income:userState.career.monthly_income.value}
+}
+
 function identifyMainProblem(){
   const s=calc();
   if(s.finance<50)return'财务状况需要重点关注，建议先建立应急储备';
   if(s.emergencyMonths<3)return'应急储备不足，建议先存够 6 个月生活费';
-  const p=userData.currentProblem;
+  const p=userState.goals.current_problem.value;
   if(p==='career')return'职业发展遇到瓶颈，需要明确下一步方向';
   if(p==='finance')return'财务规划需要优化，建议制定明确的理财目标';
   if(p==='house')return'房产决策需要谨慎，建议全面评估财务状况';
@@ -368,21 +614,18 @@ function identifyMainProblem(){
   return'当前状况总体稳定，建议持续优化各项指标'
 }
 
-// ===== 生成 5 项行动 =====
 function generateActions(){
   const s=calc();const a=[];
   if(s.emergencyMonths<6)a.push({title:'建立 6 个月生活费的应急储备',priority:'高',due:'30 天内'});
   if(s.finance<60)a.push({title:'优化支出结构，提高储蓄率到 20% 以上',priority:'高',due:'30 天内'});
-  if(userData.currentProblem==='career'||userData.currentProblem==='change')a.push({title:'明确职业方向，制定 3 个月技能提升计划',priority:'中',due:'60 天内'});
-  if(userData.debt>0&&userData.savings>userData.debt*.5)a.push({title:'制定还债计划，优先偿还高利率负债',priority:'高',due:'30 天内'});
-  if(s.monthlySaving<userData.income*.2)a.push({title:'提升收入或降低支出，提高月结余',priority:'中',due:'60 天内'});
+  if(userState.goals.current_problem.value==='career'||userState.goals.current_problem.value==='change')a.push({title:'明确职业方向，制定 3 个月技能提升计划',priority:'中',due:'60 天内'});
+  if(userState.finance.debt.value>0&&userState.finance.available_assets.value>userState.finance.debt.value*.5)a.push({title:'制定还债计划，优先偿还高利率负债',priority:'高',due:'30 天内'});
+  if(s.monthlySaving<s.income*.2)a.push({title:'提升收入或降低支出，提高月结余',priority:'中',due:'60 天内'});
   a.push({title:'设定下一个阶段性目标并拆解为月度任务',priority:'低',due:'90 天内'});
-  a.push({title:'定期复盘和调整计划',priority:'低',due:'90 天内'});
   const unique=[...new Set(a.map(x=>x.title))];
   return a.filter((v,i)=>a.findIndex(x=>x.title===v.title)===i).slice(0,5)
 }
 
-// ===== 更新首页 =====
 function updateHomePage(){
   const s=calc();
   const el=document.getElementById('overallScore');
@@ -397,7 +640,6 @@ function updateHomePage(){
   document.getElementById('topActions').innerHTML=actions.map((a,i)=>'<li class="action-item"><div class="action-number">'+(i+1)+'</div><div class="action-text">'+a.title+'</div><span class="action-priority">'+a.priority+'</span></li>').join('')
 }
 
-// ===== 自然语言解析 =====
 function parseNaturalLanguage(text){
   const info={};
   const ageM=text.match(/(\d{2})岁/);if(ageM)info.age=parseInt(ageM[1]);
@@ -419,215 +661,308 @@ function parseNaturalLanguage(text){
   return info
 }
 
-// ===== 提交问题（首页） =====
 function submitQuestion(){
   const text=document.getElementById('questionInput').value.trim();
   if(!text)return;
   const parsed=parseNaturalLanguage(text);
   let updated=false;
-  if(parsed.age&&parsed.age!==userData.age){userData.age=parsed.age;updated=true}
-  if(parsed.income&&parsed.income!==userData.income){userData.income=parsed.income;updated=true}
-  if(parsed.savings!==undefined&&parsed.savings!==userData.savings){userData.savings=parsed.savings;updated=true}
-  if(parsed.debt!==undefined&&parsed.debt!==userData.debt){userData.debt=parsed.debt;updated=true}
+  if(parsed.age&&parsed.age!==userState.basic.age.value){userState.basic.age.value=parsed.age;updated=true}
+  if(parsed.income&&parsed.income!==userState.career.monthly_income.value){userState.career.monthly_income.value=parsed.income;updated=true}
+  if(parsed.savings!==undefined&&parsed.savings!==userState.finance.available_assets.value){userState.finance.available_assets.value=parsed.savings;updated=true}
+  if(parsed.debt!==undefined&&parsed.debt!==userState.finance.debt.value){userState.finance.debt.value=parsed.debt;updated=true}
   if(updated)saveUserData();
   switchPage('decide',document.querySelectorAll('.nav-item')[1]);
   document.getElementById('decideInput').value=text;
   submitDecision()
 }
+
 function askQuick(q){document.getElementById('questionInput').value=q;submitQuestion()}
 
-// ===== 渐进式信息采集 =====
-function getRequiredInfo(question){
-  const fields=[];
-  if(question.includes('换工作')||question.includes('跳槽')){
-    if(!userData.industry)fields.push({key:'industry',label:'你所在的行业',type:'select',options:['互联网/科技','金融','教育','医疗','制造业','房地产','消费/零售','能源','传媒','其他']});
-    if(!userData.workYears)fields.push({key:'workYears',label:'工作年限',type:'select',options:['1-3 年','3-5 年','6-10 年','10 年以上']});
-  }
-  if(question.includes('买房')||question.includes('购房')){
-    if(!userData.city)fields.push({key:'city',label:'目标城市',type:'select',options:['一线城市','新一线','二线','三线及以下']});
-    if(!userData.housePrice)fields.push({key:'housePrice',label:'目标房价（万元）',type:'number'});
-    if(!userData.downPayment)fields.push({key:'downPayment',label:'可付首付（万元）',type:'number'});
-  }
-  if(question.includes('提前还贷')){
-    if(!userData.loanBalance)fields.push({key:'loanBalance',label:'剩余贷款余额（万元）',type:'number'});
-    if(!userData.loanRate)fields.push({key:'loanRate',label:'贷款利率（%）',type:'number'});
-  }
-  if(question.includes('创业')){
-    if(!userData.startupIdea)fields.push({key:'startupIdea',label:'创业方向',type:'text',placeholder:'简单描述你的创业想法'});
-  }
-  return fields
+function setDecideInput(q){document.getElementById('decideInput').value=q;submitDecision()}
+
+function identifyProblemType(q){
+  if(q.includes('换工作')||q.includes('跳槽')||q.includes('找工作'))return'job_change';
+  if(q.includes('辞职')||q.includes('离职')||q.includes('裸辞'))return'resignation';
+  if(q.includes('创业')||q.includes('开店')||q.includes('做老板'))return'startup';
+  if(q.includes('买房')||q.includes('购房')||q.includes('买房子'))return'buy_house';
+  if(q.includes('卖房')||q.includes('卖房子')||q.includes('置换'))return'sell_house';
+  if(q.includes('还贷')||q.includes('提前还')||q.includes('还房贷'))return'prepay_loan';
+  if(q.includes('投资')||q.includes('理财')||q.includes('基金')||q.includes('股票'))return'invest';
+  if(q.includes('城市')||q.includes('搬家')||q.includes('换城市'))return'relocate';
+  if(q.includes('结婚')||q.includes('离婚')||q.includes('家庭')||q.includes('孩子')||q.includes('生育'))return'family';
+  if(q.includes('教育')||q.includes('上学')||q.includes('学区')||q.includes('培训'))return'education';
+  if(q.includes('职业')||q.includes('方向')||q.includes('转型')||q.includes('规划'))return'career_direction';
+  if(q.includes('5 年')||q.includes('未来')||q.includes('以后'))return'future';
+  return'generic'
 }
 
-function showProgressiveForm(question){
-  const fields=getRequiredInfo(question);
+let askCount=0;
+const MAX_ASKS=3;
+
+function getNextSmartQuestion(q,analysis){
+  const type=identifyProblemType(q);
+  const s=calc();
+  const nw=s.netWorth;
+  const em=s.emergencyMonths;
+  const runway=s.netWorth/s.monthlyExpense;
+  if(type==='job_change'){
+    if(!userData.newSalary)return{key:'newSalary',label:'新工作预计月薪是多少？（万元）',type:'number',placeholder:'例如：2'};
+    if(!userState.career.industry.value||userState.career.industry.value==='未知')return{key:'industry',label:'你目前所在行业？',type:'select',options:['互联网/科技','金融','教育','医疗','制造业','房地产','消费/零售','能源','传媒','其他']};
+  }
+  if(type==='resignation'){
+    if(!userData.nextPlan)return{key:'nextPlan',label:'辞职后有什么具体计划？',type:'select',options:['已找到下家','准备休息一段时间','打算创业','还没想好']};
+    if(runway<12&&!userData.emergencyFund)return{key:'emergencyFund',label:'你目前的存款能支撑几个月生活费？',type:'number',placeholder:'例如：6'};
+  }
+  if(type==='startup'){
+    if(!userData.startupFund)return{key:'startupFund',label:'你准备了多少启动资金？（万元）',type:'number',placeholder:'例如：30'};
+    if(!userData.runway)return{key:'runway',label:'如果创业失败，你的存款能支撑多久？（月）',type:'number',placeholder:'例如：12'};
+  }
+  if(type==='buy_house'){
+    if(!userData.housePrice)return{key:'housePrice',label:'目标房屋总价？（万元）',type:'number',placeholder:'例如：300'};
+    if(!userData.downPayment)return{key:'downPayment',label:'你能付多少首付？（万元）',type:'number',placeholder:'例如：90'};
+    if(!userData.monthlyMortgage)return{key:'monthlyMortgage',label:'预计月供多少？（元）',type:'number',placeholder:'例如：10000'};
+  }
+  if(type==='prepay_loan'){
+    if(!userData.loanRate)return{key:'loanRate',label:'当前贷款利率是多少？（%）',type:'number',placeholder:'例如：4.2'};
+    if(!userData.investReturn)return{key:'investReturn',label:'你的投资年化收益率大约多少？（%）',type:'number',placeholder:'例如：5'};
+  }
+  if(type==='invest'){
+    if(em<6)return{key:'emergencyFirst',label:'你的应急储备够 6 个月吗？',type:'select',options:['够','不够','差不多']};
+    if(!userData.investHorizon)return{key:'investHorizon',label:'这笔钱多久不用？',type:'select',options:['1 年内','1-3 年','3-5 年','5 年以上']};
+  }
+  if(type==='relocate'){
+    if(!userData.targetCity)return{key:'targetCity',label:'目标城市是哪里？',type:'text',placeholder:'例如：深圳'};
+    if(!userData.targetSalary)return{key:'targetSalary',label:'目标城市预计月薪？（万元）',type:'number',placeholder:'例如：2'};
+  }
+  return null
+}
+
+function showSmartAsk(question,analysis){
+  if(askCount>=MAX_ASKS){finishAnalysis(question);return}
+  const q=getNextSmartQuestion(question,analysis);
   const area=document.getElementById('progressiveArea');
-  if(fields.length===0){area.innerHTML='';return}
-  let html='<div class="progressive-form"><h3>📋 补充几个信息，分析会更准确</h3>';
-  fields.forEach(f=>{
-    html+='<div class="form-group"><label class="form-label">'+f.label+'</label>';
-    if(f.type==='select'){
-      html+='<select class="form-input" id="pf_'+f.key+'"><option value="">请选择</option>';
-      f.options.forEach(o=>{html+='<option value="'+o+'">'+o+'</option>'});
-      html+='</select>'
-    }else{
-      html+='<input type="number" class="form-input" id="pf_'+f.key+'" placeholder="'+(f.placeholder||'请输入')+'">'
-    }
-    html+='</div>'
-  });
-  html+='<button class="btn btn-primary btn-block" onclick="submitProgressive()">补充完毕，重新分析</button></div>';
+  if(!q){finishAnalysis(question);return}
+  let html='<div class="progressive-form" style="border-left:3px solid var(--primary)">';
+  html+='<h3> 为了给你更准确的建议，还需要了解一个关键信息</h3>';
+  html+='<div class="form-group"><label class="form-label">'+q.label+'</label>';
+  if(q.type==='select'){
+    html+='<select class="form-input" id="smartAsk_'+q.key+'"><option value="">请选择</option>';
+    q.options.forEach(o=>{html+='<option value="'+o+'">'+o+'</option>'});
+    html+='</select>'
+  }else{
+    html+='<input type="'+(q.type||'text')+'" class="form-input" id="smartAsk_'+q.key+'" placeholder="'+(q.placeholder||'请输入')+'">'
+  }
+  html+='</div>';
+  html+='<div style="display:flex;gap:8px">';
+  html+='<button class="btn btn-primary" onclick="submitSmartAsk(\''+question+'\')" style="flex:1">回答并继续</button>';
+  html+='<button class="btn btn-secondary" onclick="skipSmartAsk(\''+question+'\')" style="flex:1">跳过</button>';
+  html+='</div>';
+  html+='<div style="font-size:11px;color:var(--text-light);margin-top:8px">已追问 '+askCount+'/'+MAX_ASKS+' 次</div>';
+  html+='</div>';
   area.innerHTML=html
 }
 
-function submitProgressive(){
+function submitSmartAsk(question){
   const area=document.getElementById('progressiveArea');
   const inputs=area.querySelectorAll('.form-input');
   inputs.forEach(inp=>{
-    const key=inp.id.replace('pf_','');
-    if(inp.value){userData[key]=inp.value}
+    const key=inp.id.replace('smartAsk_','');
+    if(inp.value){
+      const numVal=parseFloat(inp.value);
+      userData[key]=isNaN(numVal)?inp.value:numVal;
+    }
   });
   saveUserData();
+  askCount++;
   area.innerHTML='';
-  const q=document.getElementById('decideInput').value.trim();
-  if(q){
-    const analysis=generateDecisionAnalysis(q);
-    const decision={id:Date.now(),question:q,analysis:analysis,createdAt:Date.now(),status:'active'};
-    userData.decisions.unshift(decision);
-    saveUserData();
-    showDecisionDetail(decision)
-  }
+  const analysis=generateDecisionAnalysisV2(question);
+  const nextQ=getNextSmartQuestion(question,analysis);
+  if(nextQ&&askCount<MAX_ASKS){showSmartAsk(question,analysis)}else{finishAnalysis(question)}
 }
 
-// ===== 提交决策 =====
-function submitDecision(){
-  const q=document.getElementById('decideInput').value.trim();
-  if(!q)return;
-  const fields=getRequiredInfo(q);
-  const missingFields=fields.filter(f=>!userData[f.key]);
-  if(missingFields.length>0){
-    showProgressiveForm(q);
-  }
-  const analysis=generateDecisionAnalysis(q);
-  const decision={id:Date.now(),question:q,analysis:analysis,createdAt:Date.now(),status:'active'};
+function skipSmartAsk(question){document.getElementById('progressiveArea').innerHTML='';finishAnalysis(question)}
+
+function finishAnalysis(question){
+  const analysis=generateDecisionAnalysisV2(question);
+  const decision={id:Date.now(),question:question,analysis:analysis,createdAt:Date.now(),status:'active',askCount:askCount};
   userData.decisions.unshift(decision);
   saveUserData();
   showDecisionDetail(decision);
-  document.getElementById('decideInput').value=''
+  document.getElementById('decideInput').value='';
+  askCount=0
 }
 
-// ===== 决策分析引擎 =====
-function generateDecisionAnalysis(q){
-  const s=calc();const nw=s.netWorth;
-  let a={score:50,conclusion:'',mainProblem:'',reasons:[],support:[],against:[],risks:[],opportunities:[],nextSteps:[],reevaluate:[]};
+function submitDecision(){
+  const q=document.getElementById('decideInput').value.trim();
+  if(!q)return;
+  askCount=0;
+  document.getElementById('progressiveArea').innerHTML='';
+  const preliminary=generateDecisionAnalysisV2(q);
+  const nextQ=getNextSmartQuestion(q,preliminary);
+  if(nextQ){showSmartAsk(q,preliminary)}else{finishAnalysis(q)}
+}
 
-  if(q.includes('换工作')||q.includes('跳槽')){
-    a.score=s.career>60?40:65;
-    a.conclusion=s.career>60?'建议暂缓，当前工作仍有价值':'可以考虑，但需要充分准备';
-    a.mainProblem=s.career>60?'你当前职业基础还不错，跳槽的边际收益有限':'你的职业发展遇到瓶颈，需要找到突破口';
-    a.reasons=['当前职业评分'+s.career+'分，'+(s.career>60?'基础还不错':'有提升空间'),'年龄'+userData.age+'岁，'+(userData.age<35?'还有试错时间':'需要更谨慎'),'净资产'+fmt(nw)+'元，'+(nw>100000?'有一定安全垫':'需要确保财务安全')];
-    a.support=['可能获得更高收入','更好的发展平台','跳出舒适区有助于成长'];
-    a.against=['失去现有积累和人脉','适应期收入可能下降','新环境不确定性大'];
-    a.risks=['新工作可能不如预期','适应期影响收入稳定性'];
-    a.opportunities=['薪资可能提升 20-50%','接触新行业和技术'];
-    a.nextSteps=['更新简历，梳理可量化成果','建立应急储备（至少 6 个月生活费）','开始接触机会，不要急于决定'];
-    a.reevaluate=['如果出现薪资涨幅>30% 的机会','如果当前工作环境明显恶化','如果财务状况进一步改善']
-  }else if(q.includes('买房')||q.includes('购房')){
-    const em=s.emergencyMonths;
-    a.score=em>=6&&nw>200000?55:35;
-    a.conclusion=em>=6&&nw>200000?'可以考虑，但需要谨慎评估':'建议暂缓，先夯实财务基础';
-    a.mainProblem=em<6?'应急储备不足，买房会进一步降低财务安全性':'需要评估长期还款能力和职业稳定性';
-    a.reasons=['应急储备'+em.toFixed(1)+'个月，'+(em>=6?'相对充足':'不够充足'),'净资产'+fmt(nw)+'元，'+(nw>200000?'有一定基础':'还需积累'),'月供不应超过收入 40%'];
-    a.support=['长期资产增值可能','稳定居住环境','可能的政策优惠'];
-    a.against=['流动性大幅降低','月供压力持续 20-30 年','机会成本（资金被锁定）'];
-    a.risks=['房价波动风险','月供压力影响生活质量','流动性降低，应急能力下降'];
-    a.opportunities=['长期可能资产增值','提供稳定的居住和生活基础'];
-    a.nextSteps=['确保应急储备至少 6 个月','计算可承受的房价和月供','了解当地购房政策和贷款条件'];
-    a.reevaluate=['如果收入稳定增长','如果房价出现明显调整','如果有购房优惠政策']
-  }else if(q.includes('创业')){
-    a.score=nw>300000?50:30;
-    a.conclusion=nw>300000?'可以尝试，但需要充分准备':'建议暂缓，先积累更多资源和经验';
-    a.mainProblem=nw<300000?'资金储备不足，创业风险过高':'需要验证商业模式和市场需求';
-    a.reasons=['创业需要充足资金储备','当前净资产'+fmt(nw)+'元，'+(nw>300000?'有一定基础':'还需积累'),'创业风险高'];
-    a.support=['可能获得更高收入','实现个人价值','积累宝贵经验'];
-    a.against=['失败率高（>80%）','收入不稳定','需要大量时间精力'];
-    a.risks=['创业失败导致财务损失','收入不稳定，压力大','需要投入大量时间和精力'];
-    a.opportunities=['可能获得远超打工的收入','实现个人价值和理想'];
-    a.nextSteps=['制定详细商业计划','验证市场需求','建立至少 12 个月生活储备金','考虑先做副业验证'];
-    a.reevaluate=['如果找到可靠合伙人','如果获得明确客户或订单','如果财务状况进一步改善']
-  }else if(q.includes('辞职')||q.includes('离职')){
-    const runway=s.netWorth/s.monthlyExpense;
-    a.score=runway>=12?50:25;
-    a.conclusion=runway>=12?'可以辞职，但需要有明确下一步计划':'强烈建议暂缓，先找到下家再辞职';
-    a.mainProblem=runway<12?'存款不足以支撑长期求职，辞职风险极高':'需要明确辞职后的下一步计划';
-    a.reasons=['存款可支撑'+runway.toFixed(1)+'个月，'+(runway>=12?'暂时安全':'非常危险'),'辞职后收入归零','重新求职可能需要 3-6 个月'];
-    a.support=['摆脱不满意的工作环境','有时间思考和调整','心理健康可能改善'];
-    a.against=['收入完全中断','简历出现空窗期','求职市场竞争激烈'];
-    a.risks=['长期找不到工作，存款耗尽','简历空窗期影响未来求职','心理压力可能比现在更大'];
-    a.opportunities=['有时间学习新技能','可能找到更适合的方向'];
-    a.nextSteps=['确保至少有 12 个月生活费储备','先找到下家再辞职','更新简历，开始接触机会'];
-    a.reevaluate=['如果存款足够支撑 12 个月以上','如果已经有明确的下一步计划','如果当前工作严重影响健康']
-  }else if(q.includes('提前还贷')){
-    a.score=nw>userData.debt*1.5?55:35;
-    a.conclusion=nw>userData.debt*1.5?'可以考虑，但需要权衡投资收益':'建议保留现金，优先保持流动性';
-    a.mainProblem='需要平衡流动性安全和利息节省';
-    a.reasons=['净资产'+fmt(nw)+'元，负债'+fmt(userData.debt)+'元','提前还贷减少利息','但会降低流动性'];
-    a.support=['减少总利息支出','减轻心理负担','提高净资产'];
-    a.against=['失去流动性','可能错过更好投资机会','如果利率低，不一定划算'];
-    a.risks=['失去流动性，应急能力下降','可能错过更好的投资机会'];
-    a.opportunities=['减少利息支出','提高财务安全感'];
-    a.nextSteps=['确认贷款利率和投资收益率','确保保留至少 6 个月应急储备','考虑部分提前还贷'];
-    a.reevaluate=['如果贷款利率明显高于投资收益率','如果财务状况进一步改善']
-  }else if(q.includes('投资')||q.includes('理财')){
-    const em=s.emergencyMonths;
-    a.score=em>=6?60:30;
-    a.conclusion=em>=6?'可以开始投资，但需要先建立安全垫':'建议暂缓投资，先建立应急储备';
-    a.mainProblem=em<6?'应急储备不足，投资会进一步降低财务安全性':'需要学习基础投资知识，避免盲目投资';
-    a.reasons=['应急储备'+em.toFixed(1)+'个月，'+(em>=6?'基本安全':'不够安全'),'投资需要长期不用的闲钱','当前净资产'+fmt(nw)+'元'];
-    a.support=['长期复利效应显著','对抗通胀','建立被动收入'];
-    a.against=['短期可能亏损','需要学习成本','如果急用钱可能被迫割肉'];
-    a.risks=['投资亏损风险','缺乏知识导致失误','急用钱时被迫卖出'];
-    a.opportunities=['长期年化 5-10% 的复利增长','建立被动收入体系'];
-    a.nextSteps=['先存够 6 个月应急储备','学习基础投资知识（指数基金、债券）','从小额定投开始实践'];
-    a.reevaluate=['如果应急储备充足','如果有 3 年以上不用的闲钱','如果已学习基本投资知识']
-  }else if(q.includes('城市')||q.includes('搬家')){
-    a.score=50;
-    a.conclusion='需要综合评估，关键看职业机会和生活成本的变化';
-    a.mainProblem='城市选择会影响职业发展、生活质量和社交网络';
-    a.reasons=['城市选择影响职业发展和生活质量','需要考虑收入变化、生活成本、社交网络','当前净资产'+fmt(nw)+'元，搬迁有一定成本'];
-    a.support=['可能获得更好的职业机会','生活环境改善','新的社交和人脉'];
-    a.against=['失去现有社交网络','搬迁成本','新城市需要重新适应'];
-    a.risks=['新城市不如预期','社交网络断裂','搬迁成本无法回收'];
-    a.opportunities=['接触更好的职业机会','生活质量和视野提升'];
-    a.nextSteps=['对比两个城市的收入和 living cost','了解目标城市的行业机会','先去目标城市短期体验'];
-    a.reevaluate=['如果目标城市有明确的工作机会','如果生活成本差异显著','如果当前城市发展空间有限']
-  }else if(q.includes('5 年')||q.includes('未来')){
-    const ms=userData.income*.2;const ar=.05;
-    const fv=nw*Math.pow(1+ar,5)+ms*12*((Math.pow(1+ar,5)-1)/ar);
-    a.score=60;
-    a.conclusion='按当前趋势，5 年后资产约'+fmt(fv)+'元';
-    a.mainProblem='需要提高储蓄率或投资收益率，才能加速资产增长';
-    a.reasons=['当前净资产'+fmt(nw)+'元','假设每月储蓄'+fmt(ms)+'元（收入 20%）','假设年化收益率 5%'];
-    a.support=['复利效应长期显著','稳定储蓄习惯是基础'];
-    a.against=['收入增长可能不及预期','支出可能增加'];
-    a.risks=['收入增长可能不及预期','支出可能增加','投资收益可能波动'];
-    a.opportunities=['如果提高收入或降低支出，结果会更好','职业发展可能带来收入跃升'];
-    a.nextSteps=['提高储蓄率到 30% 以上','学习投资知识，提高收益率','投资自己，提升收入能力'];
-    a.reevaluate=['如果收入发生重大变化','如果支出结构改变','如果投资环境变化']
-  }else{
-    a.score=50;
-    a.conclusion='需要更多信息才能给出明确建议';
-    a.mainProblem='问题描述不够具体，无法给出针对性建议';
-    a.reasons=['当前状况：年龄'+userData.age+'岁，月收入'+fmt(userData.income)+'元','净资产'+fmt(nw)+'元','综合评分'+s.overall+'分'];
-    a.support=['有基本数据可以分析'];
-    a.against=['缺少关键信息'];
-    a.risks=['需要评估具体风险因素'];
-    a.opportunities=['需要发现具体机会'];
-    a.nextSteps=['明确具体问题和目标','收集更多信息','咨询专业人士'];
-    a.reevaluate=['情况变化时重新评估']
+function generateDecisionAnalysisV2(q){
+  const type=identifyProblemType(q);
+  const s=calc();
+  const nw=s.netWorth;
+  const em=s.emergencyMonths;
+  const runway=s.netWorth/s.monthlyExpense;
+  const constraints=checkHardConstraints(type,s);
+  const aiAnalysis=aiReasoning(type,q,s,constraints);
+  const simulation=runSimulation(type,s);
+  return{score:aiAnalysis.score,conclusion:aiAnalysis.conclusion,mainProblem:aiAnalysis.mainProblem,planA:aiAnalysis.planA,planB:aiAnalysis.planB,aiTendency:aiAnalysis.aiTendency,risks:aiAnalysis.risks,opportunities:aiAnalysis.opportunities,changeCondition:aiAnalysis.changeCondition,nextSteps:aiAnalysis.nextSteps,simulation:simulation,constraints:constraints}
+}
+
+function checkHardConstraints(type,s){
+  const constraints=[];
+  const nw=s.netWorth;
+  const em=s.emergencyMonths;
+  const runway=s.netWorth/s.monthlyExpense;
+  if(em<3)constraints.push({level:'critical',msg:'应急储备严重不足（<3 个月），任何重大决策都极高风险'});
+  else if(em<6)constraints.push({level:'warning',msg:'应急储备不足（<6 个月），建议先建立安全垫'});
+  if(s.monthlyExpense>s.income*0.7)constraints.push({level:'critical',msg:'月供占收入比过高（>70%），现金流极度紧张'});
+  else if(s.monthlyExpense>s.income*0.5)constraints.push({level:'warning',msg:'月供占收入比偏高（>50%），财务灵活性受限'});
+  if(nw<0)constraints.push({level:'critical',msg:'净资产为负，优先解决债务问题'});
+  if(type==='resignation'){
+    if(runway<6)constraints.push({level:'critical',msg:'存款支撑不足 6 个月，辞职风险极高'});
+    else if(runway<12)constraints.push({level:'warning',msg:'存款支撑 6-12 个月，辞职需谨慎规划'});
   }
-  return a
+  if(type==='startup'){
+    if(nw<100000)constraints.push({level:'critical',msg:'启动资金不足 10 万，创业风险过高'});
+    if(runway<12)constraints.push({level:'warning',msg:'建议准备至少 12 个月生活费作为安全垫'});
+  }
+  if(type==='buy_house'){
+    const downPayment=userData.downPayment||0;
+    const housePrice=userData.housePrice||0;
+    if(downPayment<housePrice*0.2)constraints.push({level:'warning',msg:'首付比例低于 20%，可能需要额外资金'});
+    const monthlyMortgage=userData.monthlyMortgage||0;
+    if(monthlyMortgage>s.income*0.4)constraints.push({level:'critical',msg:'月供超过收入 40%，还款压力过大'});
+  }
+  return constraints
 }
 
-// ===== 显示决策详情（结论优先） =====
+function aiReasoning(type,q,s,constraints){
+  const nw=s.netWorth;
+  const em=s.emergencyMonths;
+  const runway=s.netWorth/s.monthlyExpense;
+  let result={score:50,conclusion:'',mainProblem:'',planA:{name:'方案 A',desc:'',pros:[],cons:[],cashflow:''},planB:{name:'方案 B',desc:'',pros:[],cons:[],cashflow:''},aiTendency:'',risks:[],opportunities:[],changeCondition:'',nextSteps:[]};
+  
+  if(type==='job_change'){
+    const newSalary=userData.newSalary||0;
+    const currentSalary=s.income;
+    const salaryIncrease=newSalary?((newSalary*10000-currentSalary)/currentSalary*100):0;
+    result.planA={name:'留在当前工作',desc:'维持现状，继续积累',pros:['稳定的收入和现金流','已有的职业积累和人脉','较低的不确定性'],cons:['可能错过更好的机会','职业发展可能遇到瓶颈','如果当前工作不满意，心理成本高'],cashflow:'月收入'+fmt(currentSalary)+'元，年结余'+fmt(s.monthlySaving*12)+'元'};
+    result.planB={name:'跳槽到新工作',desc:'接受新机会，寻求突破',pros:[newSalary?'薪资涨幅'+salaryIncrease.toFixed(0)+'%':'可能获得更高收入','新的职业发展平台','跳出舒适区促进成长'],cons:['失去现有积累和人脉','适应期收入可能波动','新环境不确定性大'],cashflow:newSalary?'月收入'+fmt(newSalary*10000)+'元，年结余约'+fmt(newSalary*10000*0.4*12)+'元':'收入待定'};
+    if(s.career>60&&salaryIncrease<20){result.aiTendency='倾向方案 A（留在当前工作）';result.conclusion='建议暂缓跳槽，当前职业基础不错，边际收益有限';result.score=35;result.changeCondition='如果出现薪资涨幅>30% 的机会，或当前工作环境明显恶化'}
+    else if(s.career<40||salaryIncrease>30){result.aiTendency='倾向方案 B（跳槽）';result.conclusion='可以考虑跳槽，但需要充分准备';result.score=65;result.changeCondition='如果新工作 offer 不如预期，或当前工作出现转机'}
+    else{result.aiTendency='中性，需要更多信息';result.conclusion='需要权衡利弊，建议深入评估';result.score=50;result.changeCondition='根据新工作的具体情况和当前工作的变化'}
+    result.mainProblem=s.career>60?'当前职业基础不错，跳槽的边际收益有限':'职业发展遇到瓶颈，需要找到突破口';
+    result.risks=['新工作可能不如预期','适应期影响收入稳定性','简历空窗期风险'];
+    result.opportunities=[newSalary?'薪资提升'+salaryIncrease.toFixed(0)+'%':'薪资可能提升 20-50%','接触新行业和技术','职业发展新方向'];
+    result.nextSteps=['更新简历，梳理可量化成果','确保应急储备至少 6 个月','开始接触机会，不要急于决定','对比方案 A 和 B 的 3 年现金流']
+  }
+  
+  if(type==='resignation'){
+    const nextPlan=userData.nextPlan||'还没想好';
+    result.planA={name:'继续当前工作',desc:'维持现状，寻找内部机会',pros:['稳定的收入和现金流','已有的职业积累','较低的风险'],cons:['如果工作不满意，心理成本高','可能错过外部机会','职业发展可能受限'],cashflow:'月收入'+fmt(s.income)+'元，年结余'+fmt(s.monthlySaving*12)+'元'};
+    result.planB={name:'辞职',desc:'离开当前工作，寻求新方向',pros:['摆脱不满意的工作环境','有时间思考和调整','可能找到更适合的方向'],cons:['收入完全中断','简历出现空窗期','求职市场竞争激烈'],cashflow:'月收入 0 元，每月消耗'+fmt(s.monthlyExpense)+'元，可支撑'+runway.toFixed(1)+'个月'};
+    if(runway<6){result.aiTendency='强烈倾向方案 A（继续工作）';result.conclusion='强烈建议暂缓辞职，存款不足以支撑长期求职';result.score=20;result.changeCondition='如果存款增加到支撑 12 个月以上，或已找到下家'}
+    else if(runway>=12&&nextPlan==='已找到下家'){result.aiTendency='倾向方案 B（辞职）';result.conclusion='可以辞职，已有明确下一步计划';result.score=70;result.changeCondition='如果新工作 offer 出现变数'}
+    else if(runway>=12){result.aiTendency='倾向方案 B，但需谨慎';result.conclusion='可以辞职，但需要有明确下一步计划';result.score=55;result.changeCondition='如果求职进展不顺利，或存款消耗过快'}
+    else{result.aiTendency='倾向方案 A（继续工作）';result.conclusion='建议暂缓辞职，先找到下家再辞职';result.score=30;result.changeCondition='如果存款增加到支撑 12 个月以上'}
+    result.mainProblem=runway<12?'存款不足以支撑长期求职，辞职风险极高':'需要明确辞职后的下一步计划';
+    result.risks=['长期找不到工作，存款耗尽','简历空窗期影响未来求职','心理压力可能比现在更大'];
+    result.opportunities=['有时间学习新技能','可能找到更适合的方向','心理健康可能改善'];
+    result.nextSteps=['确保至少有 12 个月生活费储备','先找到下家再辞职','更新简历，开始接触机会','制定详细的求职计划']
+  }
+  
+  if(type==='startup'){
+    const startupFund=userData.startupFund||0;
+    const runwayMonths=userData.runway||0;
+    result.planA={name:'继续打工',desc:'维持现状，积累资源和经验',pros:['稳定的收入和现金流','较低的风险','可以继续学习行业知识'],cons:['可能错过创业时机','收入增长有限','职业发展可能遇到天花板'],cashflow:'月收入'+fmt(s.income)+'元，年结余'+fmt(s.monthlySaving*12)+'元'};
+    result.planB={name:'创业',desc:'启动自己的事业',pros:['可能获得远超打工的收入','实现个人价值和理想','积累宝贵的创业经验'],cons:['失败率高（>80%）','收入不稳定','需要投入大量时间和精力'],cashflow:'启动资金'+fmt(startupFund*10000)+'元，可支撑'+runwayMonths+'个月'};
+    if(nw<300000){result.aiTendency='强烈倾向方案 A（继续打工）';result.conclusion='建议暂缓创业，先积累更多资源和经验';result.score=25;result.changeCondition='如果净资产增加到 30 万以上，或找到可靠合伙人'}
+    else if(nw>=300000&&startupFund>=50){result.aiTendency='倾向方案 B（创业），但需谨慎';result.conclusion='可以尝试创业，但需要充分准备';result.score=55;result.changeCondition='如果商业模式验证失败，或资金消耗过快'}
+    else{result.aiTendency='中性，需要更多信息';result.conclusion='需要权衡利弊，建议深入评估';result.score=45;result.changeCondition='根据创业项目的具体情况和资金准备'}
+    result.mainProblem=nw<300000?'资金储备不足，创业风险过高':'需要验证商业模式和市场需求';
+    result.risks=['创业失败导致财务损失','收入不稳定，压力大','需要投入大量时间和精力'];
+    result.opportunities=['可能获得远超打工的收入','实现个人价值和理想','积累宝贵的创业经验'];
+    result.nextSteps=['制定详细商业计划','验证市场需求','建立至少 12 个月生活储备金','考虑先做副业验证']
+  }
+  
+  if(type==='buy_house'){
+    const housePrice=userData.housePrice||0;
+    const downPayment=userData.downPayment||0;
+    const monthlyMortgage=userData.monthlyMortgage||0;
+    result.planA={name:'继续租房',desc:'维持现状，保持财务灵活性',pros:['流动性高，应急能力强','可以根据工作变化调整居住地','资金可以投资于其他渠道'],cons:['租金支出无法转化为资产','可能错过房价上涨机会','居住稳定性较差'],cashflow:'月租金支出约'+fmt(s.monthlyExpense*0.3)+'元，年结余'+fmt(s.monthlySaving*12)+'元'};
+    result.planB={name:'买房',desc:'购买房产，建立固定资产',pros:['长期资产增值可能','稳定居住环境','可能的政策优惠'],cons:['流动性大幅降低','月供压力持续 20-30 年','机会成本（资金被锁定）'],cashflow:'首付'+fmt(downPayment*10000)+'元，月供'+fmt(monthlyMortgage)+'元，占收入'+(monthlyMortgage/s.income*100).toFixed(0)+'%'};
+    if(em<6){result.aiTendency='强烈倾向方案 A（继续租房）';result.conclusion='建议暂缓买房，先夯实财务基础';result.score=25;result.changeCondition='如果应急储备增加到 6 个月以上，或收入显著增长'}
+    else if(em>=6&&nw>200000&&monthlyMortgage<s.income*0.4){result.aiTendency='倾向方案 B（买房），但需谨慎';result.conclusion='可以考虑买房，但需要谨慎评估';result.score=60;result.changeCondition='如果房价出现明显调整，或收入不稳定'}
+    else if(monthlyMortgage>s.income*0.5){result.aiTendency='强烈倾向方案 A（继续租房）';result.conclusion='月供压力过大，建议降低购房预算';result.score=20;result.changeCondition='如果首付增加到 50% 以上，或选择更便宜的房源'}
+    else{result.aiTendency='中性，需要更多信息';result.conclusion='需要权衡利弊，建议深入评估';result.score=50;result.changeCondition='根据房价走势和个人收入变化'}
+    result.mainProblem=em<6?'应急储备不足，买房会进一步降低财务安全性':'需要评估长期还款能力和职业稳定性';
+    result.risks=['房价波动风险','月供压力影响生活质量','流动性降低，应急能力下降'];
+    result.opportunities=['长期可能资产增值','提供稳定的居住和生活基础','可能的政策优惠'];
+    result.nextSteps=['确保应急储备至少 6 个月','计算可承受的房价和月供','了解当地购房政策和贷款条件','对比租房和买房的 5 年总成本']
+  }
+  
+  if(type==='prepay_loan'){
+    const loanRate=userData.loanRate||4.2;
+    const investReturn=userData.investReturn||5;
+    result.planA={name:'保留现金，正常还贷',desc:'维持现状，保持流动性',pros:['保持财务灵活性和应急能力','资金可以投资于更高收益渠道','心理安全感更强'],cons:['需要支付更多利息','负债压力持续','净资产增长较慢'],cashflow:'月还贷'+fmt(s.monthlyExpense*0.4)+'元，可投资资金'+fmt(nw)+'元'};
+    result.planB={name:'提前还贷',desc:'减少负债，降低利息支出',pros:['减少总利息支出','减轻心理负担','提高净资产'],cons:['失去流动性','可能错过更好投资机会','如果利率低，不一定划算'],cashflow:'提前还贷后，月还贷减少，可投资资金减少'};
+    if(investReturn>loanRate+1){result.aiTendency='倾向方案 A（保留现金）';result.conclusion='建议保留现金，投资收益率高于贷款利率';result.score=60;result.changeCondition='如果投资收益率下降，或贷款利率上升'}
+    else if(loanRate>investReturn+1){result.aiTendency='倾向方案 B（提前还贷）';result.conclusion='可以考虑提前还贷，贷款利率高于投资收益率';result.score=65;result.changeCondition='如果找到更高收益的投资机会'}
+    else{result.aiTendency='中性';result.conclusion='需要权衡投资收益和利息节省';result.score=50;result.changeCondition='根据投资市场变化和利率调整'}
+    result.mainProblem='需要平衡流动性安全和利息节省';
+    result.risks=['失去流动性，应急能力下降','可能错过更好的投资机会'];
+    result.opportunities=['减少利息支出','提高财务安全感'];
+    result.nextSteps=['确认贷款利率和投资收益率','确保保留至少 6 个月应急储备','考虑部分提前还贷','对比两种方案的 5 年总成本']
+  }
+  
+  if(type==='invest'){
+    result.planA={name:'暂缓投资，先建立安全垫',desc:'优先建立应急储备',pros:['财务安全性更高','避免急用钱时被迫卖出','心理负担更轻'],cons:['错过可能的投资机会','资金闲置，收益较低','通胀可能侵蚀购买力'],cashflow:'月储蓄'+fmt(s.monthlySaving)+'元，优先存入应急账户'};
+    result.planB={name:'开始投资',desc:'建立投资组合',pros:['长期复利效应显著','对抗通胀','建立被动收入'],cons:['短期可能亏损','需要学习成本','如果急用钱可能被迫割肉'],cashflow:'月投资'+fmt(s.monthlySaving*0.5)+'元，预期年化 5-10%'};
+    if(em<6){result.aiTendency='强烈倾向方案 A（暂缓投资）';result.conclusion='建议暂缓投资，先建立应急储备';result.score=25;result.changeCondition='如果应急储备增加到 6 个月以上'}
+    else if(em>=6){result.aiTendency='倾向方案 B（开始投资）';result.conclusion='可以开始投资，但需要先建立安全垫';result.score=65;result.changeCondition='如果市场出现大幅波动，或急需用钱'}
+    else{result.aiTendency='中性';result.conclusion='需要权衡安全性和收益性';result.score=50;result.changeCondition='根据应急储备和市场情况'}
+    result.mainProblem=em<6?'应急储备不足，投资会进一步降低财务安全性':'需要学习基础投资知识，避免盲目投资';
+    result.risks=['投资亏损风险','缺乏知识导致失误','急用钱时被迫卖出'];
+    result.opportunities=['长期年化 5-10% 的复利增长','建立被动收入体系','对抗通胀'];
+    result.nextSteps=['先存够 6 个月应急储备','学习基础投资知识（指数基金、债券）','从小额定投开始实践','建立长期投资计划']
+  }
+  
+  if(type==='generic'||type==='future'){
+    result.planA={name:'维持现状',desc:'继续当前的生活方式',pros:['稳定性高','风险较低','已有的积累不会丢失'],cons:['可能错过更好的机会','成长速度可能较慢','如果现状不满意，心理成本高'],cashflow:'月收入'+fmt(s.income)+'元，年结余'+fmt(s.monthlySaving*12)+'元'};
+    result.planB={name:'寻求改变',desc:'尝试新的方向或机会',pros:['可能获得更好的结果','促进个人成长','跳出舒适区'],cons:['不确定性高','可能失去现有积累','需要投入时间和精力'],cashflow:'收入和支出可能波动'};
+    result.aiTendency='需要更多信息';
+    result.conclusion='问题描述不够具体，无法给出针对性建议';
+    result.score=50;
+    result.changeCondition='根据具体情况和更多信息';
+    result.mainProblem='问题描述不够具体，无法给出针对性建议';
+    result.risks=['需要评估具体风险因素'];
+    result.opportunities=['需要发现具体机会'];
+    result.nextSteps=['明确具体问题和目标','收集更多信息','咨询专业人士']
+  }
+  
+  constraints.forEach(c=>{
+    if(c.level==='critical'){result.score=Math.max(10,result.score-20);result.risks.unshift(c.msg)}
+    else if(c.level==='warning'){result.score=Math.max(20,result.score-10);result.risks.push(c.msg)}
+  });
+  
+  return result
+}
+
+function runSimulation(type,s){
+  const nw=s.netWorth;
+  const ms=s.monthlySaving;
+  const base5=nw*Math.pow(1.05,5)+ms*12*((Math.pow(1.05,5)-1)/0.05);
+  const optimistic5=(nw+ms*12*5)*Math.pow(1.07,5);
+  const pessimistic5=(nw-ms*12*5*0.2)*Math.pow(1.03,5);
+  return{base:base5,optimistic:optimistic5,pessimistic:pessimistic5,keyVariable:'收入增长',disclaimer:'以上结果均为假设估算和情景模拟，不构成确定性预测'}
+}
+
 function showDecisionDetail(d){
   const det=document.getElementById('decisionDetail');
   const list=document.getElementById('decisionList');
@@ -635,46 +970,69 @@ function showDecisionDetail(d){
   const a=d.analysis;
   const scoreColor=a.score>=60?'var(--success)':a.score>=40?'var(--warning)':'var(--danger)';
   const scoreLabel=a.score>=70?'倾向肯定':a.score>=50?'中性建议':a.score>=30?'倾向否定':'强烈不建议';
-  
-  det.innerHTML='<button class="btn btn-secondary" onclick="hideDecisionDetail()" style="margin-bottom:16px">← 返回列表</button>'+
-    '<div class="decision-detail">'+
-    '<h2 style="font-size:18px;margin-bottom:16px">'+d.question+'</h2>'+
-    
-    // 结论区（最突出）
-    '<div style="background:'+scoreColor+'15;border-left:4px solid '+scoreColor+';padding:16px;border-radius:8px;margin-bottom:20px">'+
-    '<div style="font-size:13px;color:var(--text-light);margin-bottom:4px">【结论】</div>'+
-    '<div style="font-size:16px;font-weight:600;color:'+scoreColor+';margin-bottom:8px">'+a.conclusion+'</div>'+
-    '<div style="display:flex;align-items:center;gap:12px">'+
-    '<div style="font-size:32px;font-weight:700;color:'+scoreColor+'">'+a.score+'</div>'+
-    '<div><div style="font-size:12px;color:var(--text-light)">决策评分</div><div style="font-size:14px;font-weight:600">'+scoreLabel+'</div></div>'+
-    '</div></div>'+
-    
-    // 你现在最大的问题
-    (a.mainProblem?sec('🎯 你现在最大的问题',a.mainProblem):'')+
-    
-    // 关键原因
-    sec('📊 关键原因（最多 3 条）',a.reasons)+
-    
-    // 最大风险
-    sec('⚠️ 最大风险',a.risks)+
-    
-    // 最大机会
-    sec('🚀 最大机会',a.opportunities)+
-    
-    // 建议
-    sec(' 建议（下一步做什么）',a.nextSteps)+
-    
-    // 重新判断条件
-    sec('🔄 重新判断条件（什么情况下改变结论）',a.reevaluate)+
-    
-    // 复盘按钮
-    '<div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">'+
-    '<button class="review-btn" onclick="reviewDecision('+d.id+')">📝 复盘这个决策</button>'+
-    '</div>'+
-    
-    '<div class="disclaimer">⚠️ AI 提供分析，不替用户做最终决定。请结合自身实际情况判断。</div>'+
-    '</div>'
+  let html='<button class="btn btn-secondary" onclick="hideDecisionDetail()" style="margin-bottom:12px;width:100%">← 返回</button>';
+  html+='<div class="decision-detail">';
+  html+='<h2 style="font-size:18px;margin-bottom:14px">'+d.question+'</h2>';
+  html+='<div style="background:'+scoreColor+'15;border-left:3px solid '+scoreColor+';padding:14px;border-radius:10px;margin-bottom:16px">';
+  html+='<div style="font-size:12px;color:var(--text-light);margin-bottom:3px">【当前倾向】</div>';
+  html+='<div style="font-size:16px;font-weight:600;color:'+scoreColor+';margin-bottom:6px">'+a.conclusion+'</div>';
+  html+='<div style="display:flex;align-items:center;gap:10px">';
+  html+='<div style="font-size:28px;font-weight:700;color:'+scoreColor+'">'+a.score+'</div>';
+  html+='<div><div style="font-size:11px;color:var(--text-light)">决策评分</div><div style="font-size:13px;font-weight:600">'+scoreLabel+'</div></div>';
+  html+='</div></div>';
+  if(a.mainProblem)html+=sec(' 你真正需要解决的问题',a.mainProblem);
+  if(a.planA&&a.planB){
+    html+='<div class="decision-section"><div class="decision-section-title"> 方案对比</div>';
+    html+='<div style="display:grid;gap:10px">';
+    html+='<div style="background:var(--bg);border-radius:10px;padding:12px;border:2px solid var(--border)">';
+    html+='<div style="font-size:14px;font-weight:600;margin-bottom:6px">'+a.planA.name+'</div>';
+    html+='<div style="font-size:12px;color:var(--text-light);margin-bottom:6px">'+a.planA.desc+'</div>';
+    if(a.planA.cashflow)html+='<div style="font-size:11px;color:var(--primary);margin-bottom:6px">💰 '+a.planA.cashflow+'</div>';
+    html+='<div style="font-size:11px;margin-bottom:3px"><strong style="color:var(--success)">✓ 优势：</strong></div>';
+    html+='<div style="font-size:11px;color:var(--text-light)">'+a.planA.pros.join('、')+'</div>';
+    html+='<div style="font-size:11px;margin:6px 0 3px"><strong style="color:var(--danger)">✗ 劣势：</strong></div>';
+    html+='<div style="font-size:11px;color:var(--text-light)">'+a.planA.cons.join('、')+'</div>';
+    html+='</div>';
+    html+='<div style="background:var(--bg);border-radius:10px;padding:12px;border:2px solid var(--border)">';
+    html+='<div style="font-size:14px;font-weight:600;margin-bottom:6px">'+a.planB.name+'</div>';
+    html+='<div style="font-size:12px;color:var(--text-light);margin-bottom:6px">'+a.planB.desc+'</div>';
+    if(a.planB.cashflow)html+='<div style="font-size:11px;color:var(--primary);margin-bottom:6px">💰 '+a.planB.cashflow+'</div>';
+    html+='<div style="font-size:11px;margin-bottom:3px"><strong style="color:var(--success)">✓ 优势：</strong></div>';
+    html+='<div style="font-size:11px;color:var(--text-light)">'+a.planB.pros.join('、')+'</div>';
+    html+='<div style="font-size:11px;margin:6px 0 3px"><strong style="color:var(--danger)">✗ 劣势：</strong></div>';
+    html+='<div style="font-size:11px;color:var(--text-light)">'+a.planB.cons.join('、')+'</div>';
+    html+='</div>';
+    html+='</div></div>';
+  }
+  if(a.aiTendency){html+='<div style="background:#eff6ff;border:1px solid var(--primary);border-radius:10px;padding:12px;margin-bottom:14px">';html+='<div style="font-size:12px;font-weight:600;color:var(--primary);margin-bottom:3px"> AI 倾向</div>';html+='<div style="font-size:13px;color:var(--text)">'+a.aiTendency+'</div>';html+='</div>'}
+  if(a.risks&&a.risks.length>0)html+=sec('⚠️ 最大风险',a.risks);
+  if(a.opportunities&&a.opportunities.length>0)html+=sec(' 最大机会',a.opportunities);
+  if(a.changeCondition){html+='<div style="background:#fffbeb;border:1px solid var(--warning);border-radius:10px;padding:12px;margin-bottom:14px">';html+='<div style="font-size:12px;font-weight:600;color:var(--warning);margin-bottom:3px">🔄 什么情况下应该改变结论</div>';html+='<div style="font-size:13px;color:var(--text)">'+a.changeCondition+'</div>';html+='</div>'}
+  if(a.simulation){
+    html+='<div class="decision-section"><div class="decision-section-title">📈 情景模拟</div>';
+    html+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px">';
+    html+='<div style="background:var(--bg);border-radius:8px;padding:10px;text-align:center"><div style="font-size:10px;color:var(--text-light)">悲观</div><div style="font-size:14px;font-weight:700;color:var(--danger)">'+fmt(a.simulation.pessimistic)+'</div><div style="font-size:9px;color:var(--text-light)">支出+20%</div></div>';
+    html+='<div style="background:var(--bg);border-radius:8px;padding:10px;text-align:center"><div style="font-size:10px;color:var(--text-light)">基准</div><div style="font-size:14px;font-weight:700">'+fmt(a.simulation.base)+'</div><div style="font-size:9px;color:var(--text-light)">不改变</div></div>';
+    html+='<div style="background:var(--bg);border-radius:8px;padding:10px;text-align:center"><div style="font-size:10px;color:var(--text-light)">乐观</div><div style="font-size:14px;font-weight:700;color:var(--success)">'+fmt(a.simulation.optimistic)+'</div><div style="font-size:9px;color:var(--text-light)">收入+20%</div></div>';
+    html+='</div>';
+    html+='<div style="font-size:11px;color:var(--text-light);margin-bottom:6px">📌 影响未来最大的变量：<strong>'+a.simulation.keyVariable+'</strong></div>';
+    html+='<div style="font-size:10px;color:var(--warning)">⚠️ '+a.simulation.disclaimer+'</div>';
+    html+='</div>';
+  }
+  if(a.nextSteps&&a.nextSteps.length>0)html+=sec('📋 下一步行动',a.nextSteps);
+  if(a.constraints&&a.constraints.length>0){
+    html+='<div style="margin-top:14px">';
+    a.constraints.forEach(c=>{const color=c.level==='critical'?'var(--danger)':'var(--warning)';const bg=c.level==='critical'?'#fee2e2':'#fef3c7';html+='<div style="background:'+bg+';border-left:3px solid '+color+';padding:8px 10px;border-radius:4px;margin-bottom:6px;font-size:12px"><strong style="color:'+color+'">'+(c.level==='critical'?' 硬约束：':'⚠️ 警告：')+'</strong> '+c.msg+'</div>'});
+    html+='</div>';
+  }
+  html+='<div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">';
+  html+='<button class="review-btn" onclick="reviewDecision('+d.id+')">📝 复盘这个决策</button>';
+  html+='</div>';
+  html+='<div class="disclaimer">⚠️ AI 提供分析，不替用户做最终决定。所有未来结果均为假设/估算/情景模拟，不构成确定性预测。</div>';
+  html+='</div>';
+  det.innerHTML=html
 }
+
 function sec(title,content){
   if(!content||(typeof content==='string'&&!content)||(Array.isArray(content)&&content.length===0))return'';
   let html='<div class="decision-section"><div class="decision-section-title">'+title+'</div><div class="decision-section-content">';
@@ -682,151 +1040,122 @@ function sec(title,content){
   else{html+='<ul>'+content.map(c=>'<li>'+c+'</li>').join('')+'</ul>'}
   return html+'</div></div>'
 }
+
 function hideDecisionDetail(){document.getElementById('decisionDetail').style.display='none';document.getElementById('decisionList').style.display='block';updateDecisionList()}
+
 function updateDecisionList(){
   const list=document.getElementById('decisionList');
-  if(!userData.decisions||userData.decisions.length===0){
-    list.innerHTML='<div class="empty-state"><div class="empty-state-icon">💭</div><div class="empty-state-title">还没有做过决策</div><div class="empty-state-text">输入你的问题，开始第一次决策分析</div></div>';return
-  }
-  list.innerHTML=userData.decisions.map(d=>{
-    const sc=d.analysis.score;const scColor=sc>=60?'var(--success)':sc>=40?'var(--warning)':'var(--danger)';
-    const statusBadge=d.status==='reviewed'?'<span style="font-size:11px;color:var(--success)">✓ 已复盘</span>':'';
-    return'<div class="decision-card" onclick="showDecisionDetailById('+d.id+')"><div class="decision-question">'+d.question+'</div><div class="decision-score" style="background:'+scColor+'20;color:'+scColor+'">决策评分：'+sc+'</div><div class="decision-answer">'+d.analysis.conclusion+'</div><div class="decision-meta"><span>'+new Date(d.createdAt).toLocaleDateString('zh-CN')+'</span><span>查看详情 → '+statusBadge+'</span></div></div>'
-  }).join('')
+  if(!userData.decisions||userData.decisions.length===0){list.innerHTML='<div class="empty-state"><div class="empty-state-icon">💭</div><div class="empty-state-title">还没有做过决策</div><div class="empty-state-text">输入你的问题，开始第一次决策分析</div></div>';return}
+  list.innerHTML=userData.decisions.map(d=>{const sc=d.analysis.score;const scColor=sc>=60?'var(--success)':sc>=40?'var(--warning)':'var(--danger)';const statusBadge=d.status==='reviewed'?'<span style="font-size:10px;color:var(--success)">✓ 已复盘</span>':'';return'<div class="decision-card" onclick="showDecisionDetailById('+d.id+')"><div class="decision-question">'+d.question+'</div><div class="decision-score" style="background:'+scColor+'20;color:'+scColor+'">决策评分：'+sc+'</div><div class="decision-answer">'+d.analysis.conclusion+'</div><div class="decision-meta"><span>'+new Date(d.createdAt).toLocaleDateString('zh-CN')+'</span><span>查看 → '+statusBadge+'</span></div></div>'}).join('')
 }
+
 function showDecisionDetailById(id){const d=userData.decisions.find(x=>x.id===id);if(d)showDecisionDetail(d)}
 
-// ===== 复盘功能 =====
 function reviewDecision(id){
   const d=userData.decisions.find(x=>x.id===id);
   if(!d)return;
-  const actualResult=prompt('实际结果如何？（例如：换了工作，薪资涨了 30%）');
-  if(actualResult){
-    d.review={actualResult,reviewedAt:Date.now()};
-    d.status='reviewed';
-    saveUserData();
-    alert('复盘已保存！');
-    hideDecisionDetail();
-    updateDecisionList()
-  }
+  const a=d.analysis;
+  let html='<div style="background:var(--bg);border-radius:12px;padding:16px;margin-top:14px">';
+  html+='<h3 style="font-size:15px;margin-bottom:14px"> 复盘：'+d.question+'</h3>';
+  html+='<div style="margin-bottom:14px"><div style="font-size:12px;font-weight:600;margin-bottom:6px">原始预测</div><div style="font-size:12px;color:var(--text-light)"><div>结论：'+a.conclusion+'</div><div>AI 倾向：'+(a.aiTendency||'N/A')+'</div>';
+  if(a.simulation)html+='<div>5 年基准预测：'+fmt(a.simulation.base)+'</div>';
+  html+='</div></div>';
+  html+='<div style="margin-bottom:14px"><div style="font-size:12px;font-weight:600;margin-bottom:6px">实际结果</div>';
+  html+='<div class="form-group"><label class="form-label">实际发生了什么？</label><textarea class="form-input" id="review_actual" placeholder="例如：换了工作，薪资涨了 25%" style="min-height:50px"></textarea></div>';
+  if(a.simulation){html+='<div class="form-group"><label class="form-label">当前实际资产（元）</label><input type="number" class="form-input" id="review_actualAsset" placeholder="例如：250000"></div>'}
+  html+='<div class="form-group"><label class="form-label">主观满意度（1-10）</label><input type="number" class="form-input" id="review_satisfaction" min="1" max="10" placeholder="1-10"></div></div>';
+  html+='<button class="btn btn-primary btn-block" onclick="submitReview('+d.id+')">保存复盘</button></div>';
+  const det=document.getElementById('decisionDetail');
+  const existingReview=det.querySelector('.review-form-container');
+  if(existingReview)existingReview.remove();
+  const container=document.createElement('div');
+  container.className='review-form-container';
+  container.innerHTML=html;
+  det.appendChild(container)
 }
 
-// ===== 模拟未来 =====
+function submitReview(id){
+  const d=userData.decisions.find(x=>x.id===id);
+  if(!d)return;
+  const actualResult=document.getElementById('review_actual').value.trim();
+  const actualAsset=parseFloat(document.getElementById('review_actualAsset')?.value)||0;
+  const satisfaction=parseInt(document.getElementById('review_satisfaction')?.value)||0;
+  if(!actualResult){alert('请填写实际结果');return}
+  let deviation='';
+  if(actualAsset>0&&d.analysis.simulation){const predicted=d.analysis.simulation.base;const dev=((actualAsset-predicted)/predicted*100).toFixed(1);deviation='资产偏差：'+dev+'%（预测'+fmt(predicted)+'，实际'+fmt(actualAsset)+'）'}
+  d.review={actualResult,actualAsset,satisfaction,deviation,reviewedAt:Date.now()};
+  d.status='reviewed';
+  saveUserData();
+  const container=document.querySelector('.review-form-container');
+  if(container){container.innerHTML='<div style="background:#d1fae5;border-radius:8px;padding:14px;margin-top:14px"><div style="font-size:13px;font-weight:600;color:#065f46;margin-bottom:6px">✓ 复盘已保存</div><div style="font-size:12px;color:var(--text)"><strong>实际结果：</strong>'+actualResult+'</div>'+(deviation?'<div style="font-size:12px;color:var(--text);margin-top:3px"><strong>偏差分析：</strong>'+deviation+'</div>':'')+(satisfaction?'<div style="font-size:12px;color:var(--text);margin-top:3px"><strong>满意度：</strong>'+satisfaction+'/10</div>':'')+'</div>'}
+  updateDecisionList()
+}
+
 function updateSimulation(){
   const ic=parseInt(document.getElementById('incomeChange').value)/100;
   const ec=parseInt(document.getElementById('expenseChange').value)/100;
   const sr=parseInt(document.getElementById('savingsRate').value)/100;
   const ir=parseInt(document.getElementById('investmentReturn').value)/100;
-  const mc=parseInt(document.getElementById('mortgageChange').value)/100;
   document.getElementById('incomeChangeValue').textContent=(ic*100).toFixed(0)+'%';
   document.getElementById('expenseChangeValue').textContent=(ec*100).toFixed(0)+'%';
   document.getElementById('savingsRateValue').textContent=(sr*100).toFixed(0)+'%';
   document.getElementById('investmentReturnValue').textContent=(ir*100).toFixed(0)+'%';
-  document.getElementById('mortgageChangeValue').textContent=(mc*100).toFixed(0)+'%';
-
-  const baseME=userData.income*.6;
-  const baseMS=userData.income-baseME;
-  const baseNW=userData.savings-userData.debt;
-
-  const adjIncome=userData.income*(1+ic);
+  const baseME=userState.career.monthly_income.value*.6;
+  const baseMS=userState.career.monthly_income.value-baseME;
+  const baseNW=userState.finance.available_assets.value-userState.finance.debt.value;
+  const adjIncome=userState.career.monthly_income.value*(1+ic);
   const adjExpense=baseME*(1+ec);
-  const adjMortgage=baseME*.4*(1+mc);
-  const adjOtherExpense=adjExpense-adjMortgage+(baseME*.4);
-  const adjMS=adjIncome*(1-sr)-adjOtherExpense*(1-sr);
   const adjSaving=adjIncome*sr;
-
   const b1=baseNW*1.05+baseMS*12;
   const b3=baseNW*Math.pow(1.05,3)+baseMS*12*((Math.pow(1.05,3)-1)/.05);
   const b5=baseNW*Math.pow(1.05,5)+baseMS*12*((Math.pow(1.05,5)-1)/.05);
-
   const a1=baseNW*(1+ir)+adjSaving*12;
   const a3=baseNW*Math.pow(1+ir,3)+adjSaving*12*((Math.pow(1+ir,3)-1)/ir);
   const a5=baseNW*Math.pow(1+ir,5)+adjSaving*12*((Math.pow(1+ir,5)-1)/ir);
-
   document.getElementById('asset1Year').textContent=fmt(a1);
   document.getElementById('asset3Year').textContent=fmt(a3);
   document.getElementById('asset5Year').textContent=fmt(a5);
-
   const c1=((a1-b1)/Math.abs(b1||1)*100).toFixed(1);
   const c3=((a3-b3)/Math.abs(b3||1)*100).toFixed(1);
   const c5=((a5-b5)/Math.abs(b5||1)*100).toFixed(1);
-
   setChange('asset1YearChange',c1);setChange('asset3YearChange',c3);setChange('asset5YearChange',c5);
-
-  const impacts=[
-    {name:'收入增长',impact:Math.abs(parseFloat(c5)*ic)},
-    {name:'支出控制',impact:Math.abs(parseFloat(c5)*ec)},
-    {name:'储蓄率',impact:Math.abs(parseFloat(c5)*(sr-.2))},
-    {name:'投资回报',impact:Math.abs(parseFloat(c5)*(ir-.05))},
-    {name:'房贷变化',impact:Math.abs(parseFloat(c5)*mc)}
-  ];
+  const impacts=[{name:'收入增长',impact:Math.abs(parseFloat(c5)*ic)},{name:'支出控制',impact:Math.abs(parseFloat(c5)*ec)},{name:'储蓄率',impact:Math.abs(parseFloat(c5)*(sr-.2))},{name:'投资回报',impact:Math.abs(parseFloat(c5)*(ir-.05))}];
   impacts.sort((a,b)=>b.impact-a.impact);
   document.getElementById('keyVariable').textContent=impacts[0].name;
-
   document.getElementById('abBase').textContent=fmt(b5);
   document.getElementById('abBestTitle').textContent='如果'+impacts[0].name;
   document.getElementById('abBest').textContent=fmt(a5);
   document.getElementById('abBestDesc').textContent='vs 基准 '+fmt(b5)+'（'+(parseFloat(c5)>0?'+':'')+c5+'%）'
 }
+
 function setChange(id,val){const el=document.getElementById(id);el.textContent=(val>0?'+':'')+val+'%';el.className='simulation-change '+(val>=0?'positive':'negative')}
 
-// ===== 行动计划（带状态管理） =====
 function updateActionPage(){
   const actions=generateActions();
   const taskList=document.getElementById('taskList');
-  if(!userData.actions||userData.actions.length===0){
-    userData.actions=actions.map((a,i)=>({id:Date.now()+i,title:a.title,priority:a.priority,due:a.due,status:'pending',createdAt:Date.now()}));
-    saveUserData()
-  }
-  if(userData.actions.length===0){
-    taskList.innerHTML='<li class="empty-state"><div class="empty-state-icon">📋</div><div class="empty-state-title">还没有行动计划</div><div class="empty-state-text">完成第一次分析后，会为你生成 90 天行动计划</div></li>';return
-  }
-  taskList.innerHTML=userData.actions.map((t,i)=>{
-    const cls=t.status==='completed'?'completed':t.status==='postponed'?'postponed':t.status==='abandoned'?'abandoned':'';
-    const checked=t.status==='completed'?'checked':'';
-    const statusLabel=t.status==='completed'?'<span class="action-status status-done">已完成</span>':t.status==='postponed'?'<span class="action-status status-later">已延后</span>':t.status==='abandoned'?'<span class="action-status status-skip">已放弃</span>':'';
-    return'<li class="task-item '+cls+'"><div class="task-checkbox '+checked+'" onclick="toggleTask('+i+')"></div><div class="task-content"><div class="task-title">'+t.title+'</div><div class="task-due"><span class="action-priority">'+t.priority+'</span> '+t.due+' '+statusLabel+'</div></div><div class="task-actions"><button class="task-action" onclick="setTaskStatus('+i+',\'postponed\')">延后</button><button class="task-action" onclick="setTaskStatus('+i+',\'abandoned\')">放弃</button></div></li>'
-  }).join('')
-}
-function toggleTask(i){
-  if(!userData.actions[i])return;
-  userData.actions[i].status=userData.actions[i].status==='completed'?'pending':'completed';
-  saveUserData();updateActionPage()
-}
-function setTaskStatus(i,status){
-  if(!userData.actions[i])return;
-  userData.actions[i].status=userData.actions[i].status===status?'pending':status;
-  saveUserData();updateActionPage()
+  if(!userData.actions||userData.actions.length===0){userData.actions=actions.map((a,i)=>({id:Date.now()+i,title:a.title,priority:a.priority,due:a.due,status:'pending',createdAt:Date.now()}));saveUserData()}
+  if(userData.actions.length===0){taskList.innerHTML='<li class="empty-state"><div class="empty-state-icon">📋</div><div class="empty-state-title">还没有行动计划</div><div class="empty-state-text">完成第一次分析后，会为你生成 90 天行动计划</div></li>';return}
+  taskList.innerHTML=userData.actions.map((t,i)=>{const cls=t.status==='completed'?'completed':t.status==='postponed'?'postponed':t.status==='abandoned'?'abandoned':'';const checked=t.status==='completed'?'checked':'';const statusLabel=t.status==='completed'?'<span class="action-priority" style="background:var(--success)">已完成</span>':t.status==='postponed'?'<span class="action-priority" style="background:var(--warning)">已延后</span>':t.status==='abandoned'?'<span class="action-priority" style="background:var(--danger)">已放弃</span>':'';return'<li class="task-item '+cls+'"><div class="task-checkbox '+checked+'" onclick="toggleTask('+i+')"></div><div class="task-content"><div class="task-title">'+t.title+'</div><div class="task-due"><span class="action-priority">'+t.priority+'</span> '+t.due+' '+statusLabel+'</div></div><div class="task-actions"><button class="task-action" onclick="setTaskStatus('+i+',\'postponed\')">稍后</button><button class="task-action" onclick="setTaskStatus('+i+',\'abandoned\')">放弃</button></div></li>'}).join('')
 }
 
-// ===== 个人资料 =====
+function toggleTask(i){if(!userData.actions[i])return;userData.actions[i].status=userData.actions[i].status==='completed'?'pending':'completed';saveUserData();updateActionPage()}
+function setTaskStatus(i,status){if(!userData.actions[i])return;userData.actions[i].status=userData.actions[i].status===status?'pending':status;saveUserData();updateActionPage()}
+
 function updateProfile(){
-  document.getElementById('profileBasic').innerHTML='<div style="display:grid;gap:12px"><div><strong>年龄：</strong>'+userData.age+'岁</div><div><strong>月收入：</strong>'+userData.income.toLocaleString()+'元</div><div><strong>可用资产：</strong>'+userData.savings.toLocaleString()+'元</div><div><strong>当前负债：</strong>'+userData.debt.toLocaleString()+'元</div><div><strong>净资产：</strong>'+(userData.savings-userData.debt).toLocaleString()+'元</div><div><strong>当前关注：</strong>'+getProblemLabel(userData.currentProblem)+'</div></div>';
-  let detail='<div style="display:grid;gap:8px">';
-  if(userData.industry)detail+='<div><strong>行业：</strong>'+userData.industry+'</div>';
-  if(userData.workYears)detail+='<div><strong>工作年限：</strong>'+userData.workYears+'</div>';
-  if(userData.city)detail+='<div><strong>城市：</strong>'+userData.city+'</div>';
-  if(userData.housePrice)detail+='<div><strong>目标房价：</strong>'+userData.housePrice+'万</div>';
-  if(userData.downPayment)detail+='<div><strong>可付首付：</strong>'+userData.downPayment+'万</div>';
-  if(userData.loanBalance)detail+='<div><strong>贷款余额：</strong>'+userData.loanBalance+'万</div>';
-  if(userData.loanRate)detail+='<div><strong>贷款利率：</strong>'+userData.loanRate+'%</div>';
-  if(userData.startupIdea)detail+='<div><strong>创业方向：</strong>'+userData.startupIdea+'</div>';
-  detail+='</div>';
-  if(detail==='<div style="display:grid;gap:8px"></div>')detail='<div style="color:var(--text-light);font-size:14px">在决策过程中会自动补充</div>';
-  document.getElementById('profileDetail').innerHTML=detail;
-  if(!userData.decisions||userData.decisions.length===0){
-    document.getElementById('profileDecisions').innerHTML='<div style="color:var(--text-light);font-size:14px">完成第一次分析后，这里会显示历史决策</div>'
-  }else{
-    document.getElementById('profileDecisions').innerHTML='<div style="display:grid;gap:8px">'+userData.decisions.slice(0,5).map(d=>{
-      const reviewBadge=d.status==='reviewed'?'<div style="font-size:11px;color:var(--success);margin-top:4px">✓ 已复盘</div>':'';
-      return'<div style="padding:12px;background:var(--bg);border-radius:8px"><div style="font-weight:500">'+d.question+'</div><div style="font-size:12px;color:var(--text-light);margin-top:4px">'+new Date(d.createdAt).toLocaleDateString('zh-CN')+'</div>'+reviewBadge+'</div>'
-    }).join('')+'</div>'
-  }
+  document.getElementById('profileBasic').innerHTML='<div style="display:grid;gap:10px"><div style="display:flex;justify-content:space-between;padding:10px;background:var(--bg);border-radius:8px"><span style="font-size:13px;color:var(--text-light)">年龄</span><span style="font-size:14px;font-weight:600">'+userState.basic.age.value+'岁</span></div><div style="display:flex;justify-content:space-between;padding:10px;background:var(--bg);border-radius:8px"><span style="font-size:13px;color:var(--text-light)">月收入</span><span style="font-size:14px;font-weight:600">¥'+userState.career.monthly_income.value.toLocaleString()+'</span></div><div style="display:flex;justify-content:space-between;padding:10px;background:var(--bg);border-radius:8px"><span style="font-size:13px;color:var(--text-light)">可用资产</span><span style="font-size:14px;font-weight:600">¥'+userState.finance.available_assets.value.toLocaleString()+'</span></div><div style="display:flex;justify-content:space-between;padding:10px;background:var(--bg);border-radius:8px"><span style="font-size:13px;color:var(--text-light)">负债</span><span style="font-size:14px;font-weight:600">¥'+userState.finance.debt.value.toLocaleString()+'</span></div></div>';
+  if(!userData.decisions||userData.decisions.length===0){document.getElementById('profileDecisions').innerHTML='<div style="color:var(--text-light);font-size:13px">完成第一次分析后，这里会显示历史决策</div>'}
+  else{document.getElementById('profileDecisions').innerHTML='<div style="display:grid;gap:8px">'+userData.decisions.slice(0,5).map(d=>{const reviewBadge=d.status==='reviewed'?'<div style="font-size:10px;color:var(--success);margin-top:3px">✓ 已复盘</div>':'';return'<div style="padding:12px;background:var(--bg);border-radius:8px"><div style="font-size:13px;font-weight:500">'+d.question+'</div><div style="font-size:11px;color:var(--text-light);margin-top:3px">'+new Date(d.createdAt).toLocaleDateString('zh-CN')+'</div>'+reviewBadge+'</div>'}).join('')+'</div>'}
 }
-function getProblemLabel(p){const m={career:'工作/收入',finance:'财务/理财',house:'房子/房贷',change:'换工作/创业',family:'家庭',direction:'人生方向',lost:'不知道下一步怎么办'};return m[p]||p}
+
 function fmt(n){if(Math.abs(n)>=10000)return(n/10000).toFixed(1)+'万';return Math.round(n).toLocaleString()}
 function exportData(){const s=JSON.stringify(userData,null,2);const b=new Blob([s],{type:'application/json'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download='lifepath_data_'+new Date().toISOString().slice(0,10)+'.json';a.click();URL.revokeObjectURL(u)}
 function resetData(){if(confirm('确定要重置所有数据吗？这个操作不可恢复。')){localStorage.removeItem('lifepath_user');location.reload()}}
+
+function addEvent(type,content,data){const event={event_type:type,event_content:content,event_date:Date.now(),related_fields:data?Object.keys(data):[],source:'user_input',data:data};eventLog.unshift(event);if(eventLog.length>50)eventLog.pop()}
+function updateStateField(category,field,value,source='conversation',confidence='medium'){const old=userState[category][field].value;userState[category][field]={value:value,updated_at:Date.now(),source:source,confidence:confidence};addEvent('state_update',`${category}.${field}: ${old} → ${value}`,{[field]:value})}
+function isFieldExpired(category,fieldName){const f=userState[category][fieldName];const daysSinceUpdate=(Date.now()-f.updated_at)/(1000*60*60*24);return daysSinceUpdate>30}
+function getStateValue(category,field){return userState[category][field].value}
+
 init();
 </script>
 </body>
